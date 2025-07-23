@@ -1,0 +1,38 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
+
+echo "Running pre-commit hook..."
+
+# Run lint-staged
+npx lint-staged
+if [ $? -ne 0 ]; then
+    echo "Lint-staged failed. Aborting commit."
+    exit 1
+fi
+
+# Type-check
+bun run type-check
+if [ $? -ne 0 ]; then
+    echo "Type-checking failed. Aborting commit."
+    exit 1
+fi
+
+# Build
+bun run build
+if [ $? -ne 0 ]; then
+    echo "Build failed. Aborting commit."
+    exit 1
+fi
+
+# Check for changes and require changeset if necessary
+if ! git diff --cached --quiet -- 'src/**/*.ts' ':!src/**/__tests__/*'; then
+    if ! npx changeset status | grep -q "No unreleased changesets found"; then
+        echo "Changeset is present."
+    else
+        echo "No changeset found. Please run 'npx changeset add' to create one."
+        exit 1
+    fi
+fi
+
+echo "Pre-commit hook passed."
+exit 0
