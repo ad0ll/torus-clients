@@ -1,12 +1,13 @@
 // This is a reference Torus SDK client for the bot detection/author scoring service
 import { AgentClient, Keypair } from '@torus-network/sdk/agent-client';
+
+import { BOT_DETECTOR_BASE_URL } from './common';
 import {
   AuthorScorerScoreAuthorBatchInputSchema,
   AuthorScorerScoreAuthorBatchOutputSchema,
   AuthorScorerScoreAuthorInputSchema,
   AuthorScorerScoreAuthorOutputSchema,
 } from './schemas';
-import { BOT_DETECTOR_BASE_URL } from './common';
 
 export class BotDetectorClient {
   private client: AgentClient;

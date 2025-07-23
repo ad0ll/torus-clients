@@ -1,4 +1,6 @@
 import { AgentClient, Keypair } from '@torus-network/sdk/agent-client';
+
+import { PREDICTION_VERIFIER_BASE_URL } from './common';
 import {
   type PredictionVerifierScheduledOutput,
   type PredictionVerifierVerifyRawPredictionInput,
@@ -6,7 +8,6 @@ import {
   type PredictionVerifierVerifySwarmPredictionInput,
   type PredictionVerifierVerifySwarmPredictionOutput,
 } from './schemas';
-import { PREDICTION_VERIFIER_BASE_URL } from './common';
 
 export class PredictionVerifierClient {
   private client: AgentClient;

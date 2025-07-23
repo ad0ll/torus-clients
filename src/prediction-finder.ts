@@ -1,6 +1,7 @@
 import { AgentClient, Keypair } from '@torus-network/sdk/agent-client';
-import { type PredictionFinderOnDemandInputSchema, type PredictionFinderScheduledInputSchema } from './schemas';
+
 import { PREDICTION_FINDER_BASE_URL } from './common';
+import { type PredictionFinderOnDemandInputSchema, type PredictionFinderScheduledInputSchema } from './schemas';
 
 export class PredictionFinderClient {
   private client: AgentClient;

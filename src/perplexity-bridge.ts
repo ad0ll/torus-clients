@@ -1,11 +1,12 @@
 import { AgentClient, Keypair } from '@torus-network/sdk/agent-client';
+
+import { PERPLEXITY_BRIDGE_BASE_URL } from './common';
 import {
   type PerplexityBridgeChatCompletionsInput,
   type PerplexityBridgeChatCompletionsOutput,
   type PerplexityBridgeChatCompletionsRawInput,
   type PerplexityBridgeChatCompletionsRawOutput,
 } from './schemas';
-import { PERPLEXITY_BRIDGE_BASE_URL } from './common';
 
 export class PerplexityBridgeClient {
   private client: AgentClient;

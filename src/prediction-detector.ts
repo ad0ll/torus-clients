@@ -1,5 +1,7 @@
 // This is a reference Torus SDK client for the prediction detection service
 import { AgentClient, Keypair } from '@torus-network/sdk/agent-client';
+
+import { PREDICTION_DETECTOR_BASE_URL } from './common';
 import {
   type PredictionDetectorTextBatchInputSchema,
   type PredictionDetectorTextBatchOutputSchema,
@@ -8,7 +10,6 @@ import {
   type PredictionDetectorXInputSchema,
   type PredictionDetectorXOutputSchema,
 } from './schemas';
-import { PREDICTION_DETECTOR_BASE_URL } from './common';
 
 export class PredictionDetectorClient {
   private client: AgentClient;

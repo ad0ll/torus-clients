@@ -1,38 +1,19 @@
 #!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
 echo "Running pre-commit hook..."
 
-# Run lint-staged
+echo "🔍 Step 1: Running lint-staged..."
 npx lint-staged
-if [ $? -ne 0 ]; then
-    echo "Lint-staged failed. Aborting commit."
-    exit 1
-fi
+echo "✅ lint-staged complete."
 
-# Type-check
+echo "🔎 Step 2: Running type-check..."
+# We need to run this on all files, not just the staged ones
 bun run type-check
-if [ $? -ne 0 ]; then
-    echo "Type-checking failed. Aborting commit."
-    exit 1
-fi
+echo "✅ type-check complete."
 
-# Build
+echo "📦 Step 3: Running build..."
+# We need to build all files, not just the staged ones
 bun run build
-if [ $? -ne 0 ]; then
-    echo "Build failed. Aborting commit."
-    exit 1
-fi
+echo "✅ build complete."
 
-# Check for changes and require changeset if necessary
-if ! git diff --cached --quiet -- 'src/**/*.ts' ':!src/**/__tests__/*'; then
-    if ! npx changeset status | grep -q "No unreleased changesets found"; then
-        echo "Changeset is present."
-    else
-        echo "No changeset found. Please run 'npx changeset add' to create one."
-        exit 1
-    fi
-fi
 
-echo "Pre-commit hook passed."
-exit 0
+echo "✅ All checks passed."

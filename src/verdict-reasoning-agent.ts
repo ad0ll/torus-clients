@@ -1,4 +1,5 @@
 import { AgentClient, Keypair } from '@torus-network/sdk/agent-client';
+
 import { VERDICT_REASONING_AGENT_BASE_URL } from './common';
 import {
   type VerdictReasoningAgentCreatePredictionVerdictInput,
