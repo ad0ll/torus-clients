@@ -8,7 +8,6 @@ export const PREDICTION_VERIFIER_BASE_URL = process.env.PREDICTION_VERIFIER_BASE
 
 export const OPENROUTER_ROUTER_BASE_URL = process.env.OPENROUTER_ROUTER_BASE_URL || 'https://real-trump.fun/torus/openrouter-router';
 
-export const VERDICT_REASONING_AGENT_BASE_URL =
-  process.env.VERDICT_REASONING_AGENT_BASE_URL || 'https://real-trump.fun/torus/verdict-reasoning';
+export const VERDICT_REASONING_BASE_URL = process.env.VERDICT_REASONING_BASE_URL || 'https://real-trump.fun/torus/verdict-reasoning';
 
 export const PERPLEXITY_BRIDGE_BASE_URL = process.env.PERPLEXITY_BRIDGE_BASE_URL || 'https://real-trump.fun/torus/perplexity-bridge';

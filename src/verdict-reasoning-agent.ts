@@ -1,6 +1,6 @@
 import { AgentClient, Keypair } from '@torus-network/sdk/agent-client';
 
-import { VERDICT_REASONING_AGENT_BASE_URL } from './common';
+import { VERDICT_REASONING_BASE_URL } from './common';
 import {
   type VerdictReasoningAgentCreatePredictionVerdictInput,
   type VerdictReasoningAgentCreatePredictionVerdictOutput,
@@ -11,8 +11,9 @@ import {
 export class VerdictReasoningAgentClient {
   private client: AgentClient;
 
-  constructor(mnemonic: string, baseUrl: string = VERDICT_REASONING_AGENT_BASE_URL) {
+  constructor(mnemonic: string, baseUrl: string = VERDICT_REASONING_BASE_URL) {
     const keypair = new Keypair(mnemonic);
+    console.log(`VerdictReasoningAgentClient sending requests to: ${baseUrl}`);
     this.client = new AgentClient({
       keypair,
       baseUrl,
@@ -24,11 +25,13 @@ export class VerdictReasoningAgentClient {
     data?: VerdictReasoningAgentCreatePredictionVerdictOutput;
     error?: string;
   }> {
+    console.log('input', input);
     const response = await this.client.call({
       endpoint: 'make-verdict',
       data: input,
     });
 
+    console.log('response', response);
     if (response.success) {
       return {
         success: true,
@@ -42,6 +45,7 @@ export class VerdictReasoningAgentClient {
     }
   }
 
+  //Same exact function as makeVerdict, but with more gusto
   async servePapers(input: VerdictReasoningAgentCreatePredictionVerdictInput): Promise<{
     success: boolean;
     data?: VerdictReasoningAgentCreatePredictionVerdictOutput;
@@ -65,6 +69,7 @@ export class VerdictReasoningAgentClient {
     }
   }
 
+  //Private function, can only be called by private job runner. Do not use.
   async scheduled(input: VerdictReasoningAgentScheduledInput): Promise<{
     success: boolean;
     data?: VerdictReasoningAgentScheduledOutput;

@@ -224,7 +224,9 @@ import { VerdictReasoningAgentClient } from '@trump-fun/torus-clients';
 
 const client = new VerdictReasoningAgentClient(mnemonic, 'https://real-trump.fun/torus/verdict-reasoning');
 
-//TODO, agent is deployed, but needs refinement and testing, expected to go public 07/23/2025 - 07/24/2025
+ const response = await verdictReasoningClient.makeVerdict({
+        predictionId: 1,
+      })
 ```
 
 ###  perplexity-bridge
