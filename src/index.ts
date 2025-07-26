@@ -2,6 +2,7 @@ export * from './bot-detector';
 export * from './common';
 export * from './openrouter-router';
 export * from './perplexity-bridge';
+export * from './prediction-context-finder';
 export * from './prediction-detector';
 export * from './prediction-finder';
 export * from './prediction-verifier';
