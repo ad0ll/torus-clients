@@ -3,11 +3,11 @@ import { z } from 'zod';
 
 import { PREDICTION_CONTEXT_FINDER_BASE_URL } from './common';
 import {
-  type FindPredictionContextRequest,
-  FindPredictionContextResponseSchema,
-  type PredictionContextFinderRequest,
-  type PredictionContextFinderResponse,
-  predictionContextFinderScheduledOutputSchema,
+  type PredictionContextFinderFindContextInput,
+  type PredictionContextFinderFindContextOutput,
+  type PredictionContextFinderFindPredictionContextInput,
+  type PredictionContextFinderFindPredictionContextOutput,
+  PredictionContextFinderScheduledOutputSchema,
 } from './schemas';
 
 export class PredictionContextFinderClient {
@@ -18,9 +18,9 @@ export class PredictionContextFinderClient {
     this.client = new AgentClient({ keypair, baseUrl });
   }
 
-  async findContext(input: PredictionContextFinderRequest): Promise<{
+  async findContext(input: PredictionContextFinderFindContextInput): Promise<{
     success: boolean;
-    data?: PredictionContextFinderResponse;
+    data?: PredictionContextFinderFindContextOutput;
     error?: string;
   }> {
     const response = await this.client.call({
@@ -31,7 +31,7 @@ export class PredictionContextFinderClient {
     if (response.success) {
       return {
         success: true,
-        data: response.data as PredictionContextFinderResponse,
+        data: response.data as PredictionContextFinderFindContextOutput,
       };
     }
     return {
@@ -40,20 +40,20 @@ export class PredictionContextFinderClient {
     };
   }
 
-  async findPredictionContext(input: FindPredictionContextRequest): Promise<{
+  async findPredictionContext(params: PredictionContextFinderFindPredictionContextInput): Promise<{
     success: boolean;
-    data?: z.infer<typeof FindPredictionContextResponseSchema>;
+    data?: PredictionContextFinderFindPredictionContextOutput;
     error?: string;
   }> {
     const response = await this.client.call({
       endpoint: 'find-prediction-context',
-      data: input,
+      data: params,
     });
 
     if (response.success) {
       return {
         success: true,
-        data: response.data as z.infer<typeof FindPredictionContextResponseSchema>,
+        data: response.data as PredictionContextFinderFindPredictionContextOutput,
       };
     }
     return {
@@ -64,7 +64,7 @@ export class PredictionContextFinderClient {
 
   async scheduled(): Promise<{
     success: boolean;
-    data?: z.infer<typeof predictionContextFinderScheduledOutputSchema>;
+    data?: z.infer<typeof PredictionContextFinderScheduledOutputSchema>;
     error?: string;
   }> {
     const response = await this.client.call({
@@ -75,7 +75,7 @@ export class PredictionContextFinderClient {
     if (response.success) {
       return {
         success: true,
-        data: response.data as z.infer<typeof predictionContextFinderScheduledOutputSchema>,
+        data: response.data as z.infer<typeof PredictionContextFinderScheduledOutputSchema>,
       };
     }
     return {

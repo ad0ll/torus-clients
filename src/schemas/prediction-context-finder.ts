@@ -1,35 +1,38 @@
 import { z } from 'zod';
 
-export const PredictionContextFinderRequestSchema = z.object({
+export const PredictionContextFinderFindContextInputSchema = z.object({
   entityId: z.string(),
-  platform: z.union([z.literal('x'), z.literal('twitter')]),
+  platform: z.union([z.literal('x'), z.literal('twitter')]).default('x'),
   includeRaw: z.boolean().default(true),
 });
-export type PredictionContextFinderRequest = z.infer<typeof PredictionContextFinderRequestSchema>;
+export type PredictionContextFinderFindContextInput = z.infer<typeof PredictionContextFinderFindContextInputSchema>;
 
-export const PredictionContextFinderResponseSchema = z.object({
+export const PredictionContextFinderFindContextOutputSchema = z.object({
   entityId: z.string(),
   platform: z.union([z.literal('x'), z.literal('twitter')]),
   context: z.string(),
   rawContext: z.any().optional(),
 });
-export type PredictionContextFinderResponse = z.infer<typeof PredictionContextFinderResponseSchema>;
+export type PredictionContextFinderFindContextOutput = z.infer<typeof PredictionContextFinderFindContextOutputSchema>;
 
-export const FindPredictionContextRequestSchema = z.object({
+export const PredictionContextFinderFindPredictionContextInputSchema = z.object({
   predictionId: z.number(),
+  includeRaw: z.boolean().default(true).optional(),
 });
-export type FindPredictionContextRequest = z.infer<typeof FindPredictionContextRequestSchema>;
+export type PredictionContextFinderFindPredictionContextInput = z.infer<typeof PredictionContextFinderFindPredictionContextInputSchema>;
 
-export const FindPredictionContextResponseSchema = z.object({
+export const PredictionContextFinderFindPredictionContextOutputSchema = z.object({
+  predictionId: z.number(),
   entityId: z.string(),
   platform: z.enum(['x', 'twitter']),
   context: z.string(),
   rawContext: z.any().optional(),
 });
+export type PredictionContextFinderFindPredictionContextOutput = z.infer<typeof PredictionContextFinderFindPredictionContextOutputSchema>;
 
-export const predictionContextFinderScheduledInputSchema = z.object({}).describe('Input for the scheduled prediction context finder job.');
+export const PredictionContextFinderScheduledInputSchema = z.object({}).describe('Input for the scheduled prediction context finder job.');
 
-export const predictionContextFinderScheduledOutputSchema = z.object({
+export const PredictionContextFinderScheduledOutputSchema = z.object({
   status: z.string(),
   updatedPredictions: z.array(z.number()),
 });
