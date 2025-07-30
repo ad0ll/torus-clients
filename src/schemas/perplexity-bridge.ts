@@ -25,6 +25,12 @@ export const perplexityBridgeChatCompletionsRawInputSchema = z.object({
     .string()
     .optional()
     .describe('Filters search results to only include content published after this date. Format should be %m/%d/%Y (e.g. 3/1/2025)'),
+  response_format: z
+    .object({
+      type: z.enum(['json_object', 'json_schema']),
+      json_schema: z.any().optional(),
+    })
+    .optional(),
   search_before_date_filter: z
     .string()
     .optional()
@@ -41,19 +47,11 @@ export const perplexityBridgeChatCompletionsRawInputSchema = z.object({
   stream: z.boolean().default(false).optional().describe('Determines whether to stream the response incrementally.'),
   presence_penalty: z.number().default(0).optional().describe('Positive values increase the likelihood of discussing new topics.'),
   frequency_penalty: z.number().default(0).optional().describe('Decreases likelihood of repetition based on prior frequency.'),
-  response_format: z.object({}).passthrough().optional().describe('Enables structured JSON output formatting.'),
   web_search_options: z
     .object({
-      user_location: z
-        .object({
-          latitude: z.number(),
-          longitude: z.number(),
-          country: z.string(),
-        })
-        .optional(),
+      search_context_size: z.enum(['low', 'medium', 'high']).optional(),
     })
-    .optional()
-    .describe('Configuration for using web search in model responses.'),
+    .optional(),
 });
 
 export const perplexityBridgeChatCompletionsRawOutputSchema = z.object({

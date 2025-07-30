@@ -23,6 +23,7 @@ export const predictionDetectorSingleItemOutputSchema = z.object({
     .max(1)
     .describe('The confidence of the prediction on a scale of 0 to 1, where 1 is very confident and 0 is not confident at all.'),
   reasoning: z.string().describe('A concise explanation for the classification, no more than 150 words.'),
+  topic: z.string().describe('The topic of the prediction, e.g., "politics", "sports", "crypto".'),
   full_post: z.string(),
   predictions: z.array(z.string()),
   error: z.string().optional(),

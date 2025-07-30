@@ -20,5 +20,16 @@ export const FindPredictionContextRequestSchema = z.object({
 });
 export type FindPredictionContextRequest = z.infer<typeof FindPredictionContextRequestSchema>;
 
-export const FindPredictionContextResponseSchema = PredictionContextFinderResponseSchema;
-export type FindPredictionContextResponse = z.infer<typeof FindPredictionContextResponseSchema>;
+export const FindPredictionContextResponseSchema = z.object({
+  entityId: z.string(),
+  platform: z.enum(['x', 'twitter']),
+  context: z.string(),
+  rawContext: z.any().optional(),
+});
+
+export const predictionContextFinderScheduledInputSchema = z.object({}).describe('Input for the scheduled prediction context finder job.');
+
+export const predictionContextFinderScheduledOutputSchema = z.object({
+  status: z.string(),
+  updatedPredictions: z.array(z.number()),
+});

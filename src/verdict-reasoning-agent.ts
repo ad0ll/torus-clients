@@ -30,6 +30,7 @@ export class VerdictReasoningAgentClient {
       endpoint: 'make-verdict',
       data: input,
     });
+    console.log('response for verdict', response);
 
     console.log('response', response);
     if (response.success) {
