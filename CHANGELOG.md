@@ -1,5 +1,11 @@
 # @trump-fun/torus-clients
 
+## 1.2.0
+
+### Minor Changes
+
+- Move swarm memory client to open source clients, add every available REST API method for completeness.
+
 ## 1.1.4
 
 ### Patch Changes

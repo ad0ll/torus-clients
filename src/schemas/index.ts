@@ -7,4 +7,5 @@ export * from './prediction-detector';
 export * from './prediction-finder';
 export * from './prediction-verifier';
 export * from './proxy-request';
+export * from './torus-swarm-memory';
 export * from './verdict-reasoning-agent';

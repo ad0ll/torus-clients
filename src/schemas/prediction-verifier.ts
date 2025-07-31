@@ -1,12 +1,6 @@
 import { z } from 'zod';
 
-export enum PredictionOutcome {
-  NotMatured = 'NotMatured',
-  MaturedTrue = 'MaturedTrue',
-  MaturedFalse = 'MaturedFalse',
-  MaturedMostlyTrue = 'MaturedMostlyTrue',
-  Unverifiable = 'Unverifiable',
-}
+import { PredictionOutcome, predictionOutcomeSchema } from './torus-swarm-memory';
 
 export const predictionVerifierVerifySwarmPredictionInputSchema = z.object({
   predictionId: z.number().describe('The swarm memory prediction id to fetch, verify, and create a prediction claim for'),
@@ -17,9 +11,8 @@ export const predictionVerifierVerifyRawPredictionInputSchema = z.object({
   context: z.record(z.string(), z.any()).optional(),
 });
 
-const baseVerificationOutputSchema = z.object({
-  prediction: z.string().describe('The prediction text that was processed'),
-  outcome: z.nativeEnum(PredictionOutcome).describe('The outcome of the prediction verification process'),
+const verificationResultSchema = z.object({
+  outcome: predictionOutcomeSchema.describe('The outcome of the prediction verification process'),
   proof: z
     .string()
     .describe(
@@ -27,11 +20,13 @@ const baseVerificationOutputSchema = z.object({
     ),
 });
 
-export const predictionVerifierVerifyRawPredictionOutputSchema = baseVerificationOutputSchema;
+export const predictionVerifierVerifyRawPredictionOutputSchema = verificationResultSchema.extend({
+  prediction: z.string().describe('The prediction text that was processed'),
+});
 
 export const predictionVerifierScheduledInputSchema = z.object({});
 
-export const predictionVerifierVerifySwarmPredictionOutputSchema = baseVerificationOutputSchema.extend({
+export const predictionVerifierVerifySwarmPredictionOutputSchema = verificationResultSchema.extend({
   prediction_id: z.number().int().describe('The ID of the prediction that this verification claim is for'),
   full_post: z.string().optional().describe('The full post text from swarm memory'),
 });
@@ -44,3 +39,5 @@ export type PredictionVerifierVerifySwarmPredictionOutput = z.infer<typeof predi
 export type PredictionVerifierVerifyRawPredictionOutput = z.infer<typeof predictionVerifierVerifyRawPredictionOutputSchema>;
 export type PredictionVerifierScheduledInput = z.infer<typeof predictionVerifierScheduledInputSchema>;
 export type PredictionVerifierScheduledOutput = z.infer<typeof predictionVerifierScheduledOutputSchema>;
+export type VerificationResult = z.infer<typeof verificationResultSchema>;
+export { PredictionOutcome };

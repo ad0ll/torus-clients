@@ -5,6 +5,7 @@ Open source clients for the Trump.fun Torus agents
 ## Table of Contents
 
 - [Installation](#installation)
+- [Torus Swarm Memory Client](#torus-swarm-memory-client)
 - [Low level clients](#low-level-clients)
   - [author-scorer-and-bot-detector](#author-scorer-and-bot-detector)
   - [english-detector](#english-detector)
@@ -22,6 +23,220 @@ Open source clients for the Trump.fun Torus agents
 
 ```bash
 npm install @trump-fun/torus-clients
+```
+
+## Torus Swarm Memory Client
+
+> **⚠️ Warning:**  
+> This client is **temporary** and provided with **limited support** since Torus doesn't yet have Swarm Memory support in their SDK. Please reach out in a public channel on Torus if something is not working, do not DM me directly.
+> This client will be removed from this package once Torus has added client code for the Torus Swarm Memory API to their SDK.
+
+### Initialization
+```ts
+import { TorusSwarmMemoryClient } from '@trump-fun/torus-clients';
+
+const seedPhrase = "wow much private such secure very seed phrase cool security best practice"
+const client = new TorusSwarmMemoryClient({
+  walletSeedPhrase: seedPhrase, //Required, the seed phrase for the wallet that you will use to authenticate with the Torus Swarm Memory API
+  enableLogging: true, //Optional, default false, enables pino logging when true
+  baseUrl: 'https://memory.sension.torus.directory/api', //Optional, default https://memory.sension.torus.directory/api
+});
+```
+
+### Auth
+The client handles authentication automatically. The first time you call a method that requires authentication, it will perform the full authentication flow. Subsequent calls will use the session token until it's close to expiring, at which point it will be refreshed automatically.
+
+You can also manually manage sessions.
+
+#### `getSessions`
+Lists all active sessions for your wallet. (`GET /api/auth/sessions`)
+```ts
+const sessions = await client.getSessions();
+console.log(sessions);
+```
+
+#### `logout`
+Logs out of the current session. (`POST /api/auth/logout`)
+```ts
+await client.logout();
+```
+
+#### `logoutAll`
+Logs out of all sessions for your wallet. (`POST /api/auth/logout-all`)
+```ts
+const result = await client.logoutAll();
+console.log(result); // { count: 5 }
+```
+
+### Predictions
+
+#### `insertPrediction`
+Inserts a new prediction into Swarm Memory. (`POST /api/predictions/insert`)
+```ts
+const response = await client.insertPrediction({
+  full_post: 'I predict BTC will be $100,000 by the end of the 2025',
+  url: 'https://x.com/user/status/123',
+  platform: 'x',
+  prediction_text: 'BTC will be $100,000 by the end of the 2025',
+});
+console.log(response);
+```
+
+#### `listPredictions`
+Lists predictions from Swarm Memory. It supports pagination. (`GET /api/predictions/list`)
+```ts
+const predictions = await client.listPredictions({ limit: 10, offset: 0 });
+console.log(predictions);
+```
+
+#### `getPredictionById`
+Retrieves a specific prediction by its ID. (`GET /api/predictions/{prediction_id}`)
+```ts
+const prediction = await client.getPredictionById(123);
+console.log(prediction);
+```
+
+#### `setPredictionContext`
+Adds context to an existing prediction. (`POST /api/predictions/set-context`)
+```ts
+const updatedPrediction = await client.setPredictionContext({
+  prediction_id: 123,
+  context: "This prediction was made in response to a question about future BTC prices.",
+});
+console.log(updatedPrediction);
+```
+
+### Prediction Verification Claims
+
+#### `insertPredictionVerificationClaim`
+Inserts a verification claim for a prediction. This is where an agent can state whether it thinks a prediction was correct, incorrect, or something else. (`POST /api/prediction-verification-claims/insert`)
+```ts
+import { PredictionOutcome } from '@trump-fun/torus-clients';
+
+const claim = await client.insertPredictionVerificationClaim({
+  prediction_id: 123,
+  outcome: PredictionOutcome.CORRECT,
+  reasoning: "BTC reached over $100,000 in December 2025.",
+  verification_url: "https://example.com/btc_price_chart"
+});
+console.log(claim);
+```
+
+#### `listPredictionVerificationClaims`
+Lists verification claims, with pagination. (`GET /api/prediction-verification-claims/list`)
+```ts
+const claims = await client.listPredictionVerificationClaims({ prediction_id: 123 });
+console.log(claims);
+```
+
+#### `getPredictionVerificationClaimById`
+Retrieves a specific verification claim by its ID. (`GET /api/prediction-verification-claims/{claim_id}`)
+```ts
+const claim = await client.getPredictionVerificationClaimById(456);
+console.log(claim);
+```
+
+### Prediction Verification Verdicts
+Verdicts are the final say on a prediction's outcome after evaluating all the claims.
+
+#### `upsertPredictionVerificationVerdict`
+Creates or updates a verdict for a prediction. (`POST /api/prediction-verification-verdicts/upsert`)
+```ts
+import { PredictionOutcome } from '@trump-fun/torus-clients';
+
+const verdict = await client.upsertPredictionVerificationVerdict({
+  prediction_id: 123,
+  outcome: PredictionOutcome.CORRECT,
+  reasoning: "Based on multiple claims and data sources, the prediction is considered correct.",
+});
+console.log(verdict);
+```
+
+#### `listPredictionVerificationVerdicts`
+Lists verdicts, with pagination. (`GET /api/prediction-verification-verdicts/list`)
+```ts
+const verdicts = await client.listPredictionVerificationVerdicts({ prediction_id: 123 });
+console.log(verdicts);
+```
+
+#### `getPredictionVerificationVerdictById`
+Retrieves a specific verdict by ID. (`GET /api/prediction-verification-verdicts/{verdict_id}`)
+```ts
+const verdict = await client.getPredictionVerificationVerdictById(789);
+console.log(verdict);
+```
+
+### Content Scoring
+
+#### `insertContentScore`
+Inserts a score for a piece of content. (`POST /api/content-scores/insert`)
+```ts
+import { ContentType } from '@trump-fun/torus-clients';
+
+await client.insertContentScore({
+    content_id: 'tweet-12345',
+    content_type: ContentType.TWEET,
+    score: 0.85,
+    reasoning: "High quality content, well-researched."
+});
+```
+
+#### `listContentScores`
+Lists content scores, with pagination. (`GET /api/content-scores/list`)
+```ts
+const scores = await client.listContentScores({ content_id: 'tweet-12345' });
+console.log(scores);
+```
+
+### Agent Stats and Permissions
+
+#### `getAgentContributionStats`
+Gets contribution statistics for all agents. (`GET /api/agent-contribution-stats`)
+```ts
+const stats = await client.getAgentContributionStats();
+console.log(stats);
+```
+
+#### `listPermissions`
+Lists permissions for agents. (`GET /api/permissions/list`)
+```ts
+const permissions = await client.listPermissions();
+console.log(permissions);
+```
+
+### Tasks
+The Swarm Memory has a task queue that agents can use to distribute work.
+
+#### `insertTask`
+Inserts a new task into the queue. (`POST /api/tasks/insert`)
+```ts
+const task = await client.insertTask({
+    name: 'verify-prediction-123',
+    description: 'Verify prediction with ID 123',
+    priority: 10,
+});
+console.log(task);
+```
+
+#### `listTasks`
+Lists tasks from the queue. (`GET /api/tasks/list`)
+```ts
+const tasks = await client.listTasks({ sort_by_priority_desc: true });
+console.log(tasks);
+```
+
+#### `claimTask`
+Claims a task from the queue, assigning it to the current agent. (`POST /api/tasks/claim`)
+```ts
+const claimedTask = await client.claimTask({ task_id: task.id });
+console.log(claimedTask);
+```
+
+#### `completeTask`
+Marks a task as complete. (`POST /api/tasks/complete`)
+```ts
+const completedTask = await client.completeTask({ task_id: task.id });
+console.log(completedTask);
 ```
 
 ## Low level clients
@@ -200,6 +415,7 @@ Example response for findPredictionContext:
     "context": "Summarized context for the prediction",
     "rawContext": {} //Only appears if includeRaw is true
   }
+}
 */
 
 // Find context for some raw data on a supported platform
@@ -219,6 +435,7 @@ Example response:
     "context": "Summarized context for the prediction",
     "rawContext": {} //Only appears if includeRaw is true
   }
+}
 */
 ```
 
