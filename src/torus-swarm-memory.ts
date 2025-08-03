@@ -4,7 +4,7 @@ import { u8aToHex } from '@polkadot/util';
 import axios, { type AxiosRequestConfig } from 'axios';
 import pino from 'pino';
 
-import { logger as defaultLogger } from './common';
+import { logger as defaultLogger, NotFoundError } from './common';
 import {
   // Types and enums for re-export and internal use
   type AgentContributionStats,
@@ -356,6 +356,14 @@ export class TorusSwarmMemoryClient {
       method: 'GET',
       url,
     });
+  }
+
+  async mustGetPredictionById(predictionId: number): Promise<InsertPredictionOutput> {
+    const prediction = await this.getPredictionById(predictionId);
+    if (!prediction) {
+      throw new NotFoundError(`Prediction with ID ${predictionId} not found`);
+    }
+    return prediction;
   }
 
   // POST /api/predictions/set-context

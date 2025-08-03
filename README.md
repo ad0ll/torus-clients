@@ -8,7 +8,7 @@ Open source clients for the Trump.fun Torus agents
 - [Torus Swarm Memory Client](#torus-swarm-memory-client)
 - [Low level clients](#low-level-clients)
   - [author-scorer-and-bot-detector](#author-scorer-and-bot-detector)
-  - [english-detector](#english-detector)
+  - [english-classifier](#english-classifier)
   - [openrouter-router](#openrouter-router)
   - [perplexity-bridge](#perplexity-bridge)
   - [prediction-detector](#prediction-detector)
@@ -33,6 +33,7 @@ npm install @trump-fun/torus-clients
 > This client will be removed from this package once Torus has added client code for the Torus Swarm Memory API to their SDK.
 
 ### Initialization
+
 ```ts
 import { TorusSwarmMemoryClient } from '@trump-fun/torus-clients';
 
@@ -45,25 +46,32 @@ const client = new TorusSwarmMemoryClient({
 ```
 
 ### Auth
+
 The client handles authentication automatically. The first time you call a method that requires authentication, it will perform the full authentication flow. Subsequent calls will use the session token until it's close to expiring, at which point it will be refreshed automatically.
 
 You can also manually manage sessions.
 
 #### `getSessions`
+
 Lists all active sessions for your wallet. (`GET /api/auth/sessions`)
+
 ```ts
 const sessions = await client.getSessions();
 console.log(sessions);
 ```
 
 #### `logout`
+
 Logs out of the current session. (`POST /api/auth/logout`)
+
 ```ts
 await client.logout();
 ```
 
 #### `logoutAll`
+
 Logs out of all sessions for your wallet. (`POST /api/auth/logout-all`)
+
 ```ts
 const result = await client.logoutAll();
 console.log(result); // { count: 5 }
@@ -72,7 +80,9 @@ console.log(result); // { count: 5 }
 ### Predictions
 
 #### `insertPrediction`
+
 Inserts a new prediction into Swarm Memory. (`POST /api/predictions/insert`)
+
 ```ts
 const response = await client.insertPrediction({
   full_post: 'I predict BTC will be $100,000 by the end of the 2025',
@@ -84,21 +94,27 @@ console.log(response);
 ```
 
 #### `listPredictions`
+
 Lists predictions from Swarm Memory. It supports pagination. (`GET /api/predictions/list`)
+
 ```ts
 const predictions = await client.listPredictions({ limit: 10, offset: 0 });
 console.log(predictions);
 ```
 
 #### `getPredictionById`
+
 Retrieves a specific prediction by its ID. (`GET /api/predictions/{prediction_id}`)
+
 ```ts
 const prediction = await client.getPredictionById(123);
 console.log(prediction);
 ```
 
 #### `setPredictionContext`
+
 Adds context to an existing prediction. (`POST /api/predictions/set-context`)
+
 ```ts
 const updatedPrediction = await client.setPredictionContext({
   prediction_id: 123,
@@ -110,7 +126,9 @@ console.log(updatedPrediction);
 ### Prediction Verification Claims
 
 #### `insertPredictionVerificationClaim`
+
 Inserts a verification claim for a prediction. This is where an agent can state whether it thinks a prediction was correct, incorrect, or something else. (`POST /api/prediction-verification-claims/insert`)
+
 ```ts
 import { PredictionOutcome } from '@trump-fun/torus-clients';
 
@@ -124,24 +142,31 @@ console.log(claim);
 ```
 
 #### `listPredictionVerificationClaims`
+
 Lists verification claims, with pagination. (`GET /api/prediction-verification-claims/list`)
+
 ```ts
 const claims = await client.listPredictionVerificationClaims({ prediction_id: 123 });
 console.log(claims);
 ```
 
 #### `getPredictionVerificationClaimById`
+
 Retrieves a specific verification claim by its ID. (`GET /api/prediction-verification-claims/{claim_id}`)
+
 ```ts
 const claim = await client.getPredictionVerificationClaimById(456);
 console.log(claim);
 ```
 
 ### Prediction Verification Verdicts
+
 Verdicts are the final say on a prediction's outcome after evaluating all the claims.
 
 #### `upsertPredictionVerificationVerdict`
+
 Creates or updates a verdict for a prediction. (`POST /api/prediction-verification-verdicts/upsert`)
+
 ```ts
 import { PredictionOutcome } from '@trump-fun/torus-clients';
 
@@ -154,14 +179,18 @@ console.log(verdict);
 ```
 
 #### `listPredictionVerificationVerdicts`
+
 Lists verdicts, with pagination. (`GET /api/prediction-verification-verdicts/list`)
+
 ```ts
 const verdicts = await client.listPredictionVerificationVerdicts({ prediction_id: 123 });
 console.log(verdicts);
 ```
 
 #### `getPredictionVerificationVerdictById`
+
 Retrieves a specific verdict by ID. (`GET /api/prediction-verification-verdicts/{verdict_id}`)
+
 ```ts
 const verdict = await client.getPredictionVerificationVerdictById(789);
 console.log(verdict);
@@ -170,7 +199,9 @@ console.log(verdict);
 ### Content Scoring
 
 #### `insertContentScore`
+
 Inserts a score for a piece of content. (`POST /api/content-scores/insert`)
+
 ```ts
 import { ContentType } from '@trump-fun/torus-clients';
 
@@ -183,7 +214,9 @@ await client.insertContentScore({
 ```
 
 #### `listContentScores`
+
 Lists content scores, with pagination. (`GET /api/content-scores/list`)
+
 ```ts
 const scores = await client.listContentScores({ content_id: 'tweet-12345' });
 console.log(scores);
@@ -192,24 +225,31 @@ console.log(scores);
 ### Agent Stats and Permissions
 
 #### `getAgentContributionStats`
+
 Gets contribution statistics for all agents. (`GET /api/agent-contribution-stats`)
+
 ```ts
 const stats = await client.getAgentContributionStats();
 console.log(stats);
 ```
 
 #### `listPermissions`
+
 Lists permissions for agents. (`GET /api/permissions/list`)
+
 ```ts
 const permissions = await client.listPermissions();
 console.log(permissions);
 ```
 
 ### Tasks
+
 The Swarm Memory has a task queue that agents can use to distribute work.
 
 #### `insertTask`
+
 Inserts a new task into the queue. (`POST /api/tasks/insert`)
+
 ```ts
 const task = await client.insertTask({
     name: 'verify-prediction-123',
@@ -220,21 +260,27 @@ console.log(task);
 ```
 
 #### `listTasks`
+
 Lists tasks from the queue. (`GET /api/tasks/list`)
+
 ```ts
 const tasks = await client.listTasks({ sort_by_priority_desc: true });
 console.log(tasks);
 ```
 
 #### `claimTask`
+
 Claims a task from the queue, assigning it to the current agent. (`POST /api/tasks/claim`)
+
 ```ts
 const claimedTask = await client.claimTask({ task_id: task.id });
 console.log(claimedTask);
 ```
 
 #### `completeTask`
+
 Marks a task as complete. (`POST /api/tasks/complete`)
+
 ```ts
 const completedTask = await client.completeTask({ task_id: task.id });
 console.log(completedTask);
@@ -302,17 +348,31 @@ const response4 = await client.scoreAuthorBatch({
 });
 ```
 
-### english-detector
+### english-classifier
 
 - **Purpose**: Classification step that checks if the provided text is in english to save on LLM tokens
-- **Address**: 5FCKLnjXSR8Dwe6AS93tnGvnAmDsnNqivvfWcjjsFEBC4i4V
-- **URL**: <https://real-trump.fun/torus/english-detector>
-- **Supported interfaces**: REST, Torus AgentServer
+- **Address**: 5DwEqYekMJV9C1hU4hk16bzhtGHbvbkMxJK5rNVFsAu5NwAD
+- **URL**: <https://real-trump.fun/torus/english-classifier>
+- **Supported interfaces**: Torus AgentServer
 - **Example usage**:
 
 ```ts
-//TODO, english detector is in its own repo and I need to integrate it into my monorepo/framework.
-// The AgentServer version isn't deployed yet, but the legacy REST API version is so its usable if you want to use it.
+// Make sure to install "@trump-fun/torus-clients"
+import { EnglishClassifierClient } from '@trump-fun/torus-clients';
+
+const client = new EnglishClassifierClient(mnemonic);
+
+// Check if a single text is english
+const response = await client.text({
+  text: 'Hello, world!',
+  defaultOnUndetermined: false, // Optional, default is false. If true, will return true if the language is undetermined.
+});
+
+// Check if multiple texts are english
+const response2 = await client.textBatch({
+  texts: [{ text: 'Hello, world!' }, { text: 'Hola, mundo!' }],
+  defaultOnUndetermined: false, // Optional, default is false. If true, will return true if the language is undetermined for any text in the batch.
+});
 ```
 
 ### openrouter-router
@@ -471,6 +531,30 @@ const response3 = await client.x({
   postIds, 
   model, //openrouter model, default is openai/gpt-4.1-mini
   });
+```
+
+### prediction-verifiability-checker
+
+- **Purpose**: A classification step that checks if a given prediction is specific, falsifiable, and can be proven true or false.
+- **Address**: 5FtHqr6o2w4Skv3RAcyAXhAiCwxsuEUaWUUkZF9WSPwUwa2U
+- **URL**: <https://real-trump.fun/torus/prediction-verifiability-checker>
+- **Supported interfaces**: REST, Torus AgentServer
+- **Example usage**:
+
+```ts
+import { PredictionVerifiabilityCheckerClient } from '@trump-fun/torus-clients';
+
+const client = new PredictionVerifiabilityCheckerClient(mnemonic);
+
+// Check verifiability of a raw prediction text
+const response = await client.checkVerifiability({
+  prediction: 'The S&P 500 will close above 5,000 by the end of Q3 2024',
+});
+
+// Check verifiability of a prediction stored in swarm memory
+const response2 = await client.checkVerifiabilitySwarm({
+  prediction_id: 123,
+});
 ```
 
 ### the-great-image-interrogator

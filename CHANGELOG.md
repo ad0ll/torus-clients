@@ -1,5 +1,11 @@
 # @trump-fun/torus-clients
 
+## 1.4.0
+
+### Minor Changes
+
+- Add prediction-verifiability-checker and english-classifier clients
+
 ## 1.3.0
 
 ### Minor Changes

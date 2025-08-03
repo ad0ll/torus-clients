@@ -29,7 +29,7 @@ export class VeniceBridgeClient {
     }
     return {
       success: false,
-      error: (response.error?.data as { error: string })?.error || response.error?.message || 'Failed to call chat-completions endpoint',
+      error: response.error?.message || 'Failed to call chat-completions endpoint',
     };
   }
 }
