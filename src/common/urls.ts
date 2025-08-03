@@ -12,8 +12,6 @@ export const VERDICT_REASONING_BASE_URL = process.env.VERDICT_REASONING_BASE_URL
 
 export const PERPLEXITY_BRIDGE_BASE_URL = process.env.PERPLEXITY_BRIDGE_BASE_URL || 'https://real-trump.fun/torus/perplexity-bridge';
 
-export const PROXY_REQUEST_BASE_URL = process.env.PROXY_REQUEST_BASE_URL || 'https://real-trump.fun/torus/proxy-request';
-
 export const PREDICTION_CONTEXT_FINDER_BASE_URL =
   process.env.PREDICTION_CONTEXT_FINDER_BASE_URL || 'https://real-trump.fun/torus/prediction-context-finder';
 
