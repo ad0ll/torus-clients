@@ -1,5 +1,11 @@
 # @trump-fun/torus-clients
 
+## 1.4.2
+
+### Patch Changes
+
+- Add specifying the agent to client calls against openrouter and venice-bridge for cost tracking
+
 ## 1.4.1
 
 ### Patch Changes
