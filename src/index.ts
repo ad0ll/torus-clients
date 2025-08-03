@@ -8,4 +8,5 @@ export * from './prediction-finder';
 export * from './prediction-verifier';
 export * from './schemas';
 export * from './torus-swarm-memory';
+export * from './venice-bridge';
 export * from './verdict-reasoning-agent';

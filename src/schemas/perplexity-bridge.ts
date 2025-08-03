@@ -1,12 +1,20 @@
 import { z } from 'zod';
 
+export enum PerplexityModel {
+  Sonar = 'sonar',
+  SonarPro = 'sonar-pro',
+  SonarReasoning = 'sonar-reasoning',
+  SonarReasoningPro = 'sonar-reasoning-pro',
+  SonarDeepResearch = 'sonar-deep-research',
+}
+
 const messageSchema = z.object({
   role: z.enum(['system', 'user', 'assistant']),
   content: z.string(),
 });
 
 export const perplexityBridgeChatCompletionsRawInputSchema = z.object({
-  model: z.string().describe('The name of the model that will complete your prompt.'),
+  model: z.nativeEnum(PerplexityModel).describe('The name of the model that will complete your prompt.'),
   messages: z.array(messageSchema).describe('A list of messages comprising the conversation so far.'),
   search_mode: z.enum(['academic', 'web']).default('web').optional().describe('Controls the search mode used for the request.'),
   reasoning_effort: z
@@ -56,22 +64,16 @@ export const perplexityBridgeChatCompletionsRawInputSchema = z.object({
 
 export const perplexityBridgeChatCompletionsRawOutputSchema = z.object({
   id: z.string(),
-  model: z.enum([
-    'sonar', // $1/m input, $1/m output A lightweight, cost-effective search model optimized for quick, grounded answers with real-time web search.
-    'sonar-pro', //$3/m input, $15/m output An advanced search model designed for complex queries, delivering deeper content understanding with enhanced citation accuracy and 2x more citations than standard Sonar.
-    'sonar-reasoning', // $1/m input, $5/m output A reasoning-focused model that applies Chain-of-Thought (CoT) reasoning for quick problem-solving and structured analysis with real-time web search.
-    'sonar-reasoning-pro', // $2/m input, $8/m output A high-performance reasoning model leveraging advanced multi-step Chain-of-Thought (CoT) reasoning and enhanced information retrieval for complex problem-solving.
-    'sonar-deep-research', // $2/m input, $8/m output A powerful research model capable of conducting exhaustive searches across hundreds of sources, synthesizing expert-level insights, and generating detailed reports with comprehensive analysis.
-  ]),
+  model: z.nativeEnum(PerplexityModel),
   created: z.number(),
   usage: z.object({
     prompt_tokens: z.number(),
     completion_tokens: z.number(),
     total_tokens: z.number(),
-    search_context_size: z.string().nullable(),
-    citation_tokens: z.number().nullable(),
-    num_search_queries: z.number().nullable(),
-    reasoning_tokens: z.number().nullable(),
+    search_context_size: z.string().nullable().optional(),
+    citation_tokens: z.number().nullable().optional(),
+    num_search_queries: z.number().nullable().optional(),
+    reasoning_tokens: z.number().nullable().optional(),
   }),
   object: z.string().default('chat.completion'),
   choices: z.array(
@@ -90,7 +92,7 @@ export const perplexityBridgeChatCompletionsRawOutputSchema = z.object({
       z.object({
         title: z.string(),
         url: z.string(),
-        date: z.string(),
+        date: z.string().nullable().optional(),
       }),
     )
     .nullable(),

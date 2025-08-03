@@ -1,5 +1,11 @@
 # @trump-fun/torus-clients
 
+## 1.3.0
+
+### Minor Changes
+
+- Detailed cost tracking, add venice-bridge agent, most agents calling openrouter-router instead of internal tool
+
 ## 1.2.0
 
 ### Minor Changes

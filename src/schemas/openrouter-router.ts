@@ -41,6 +41,7 @@ const baseOpenrouterInput = {
   min_p: z.number().optional().describe('Minimum probability threshold (range: [0, 1]).'),
   top_a: z.number().optional().describe('Alternate top sampling parameter (range: [0, 1]).'),
   user: z.string().optional().describe('A stable identifier for your end-users. Used to help detect and prevent abuse.'),
+  response_format: z.any().optional(),
 };
 
 const refinement = (data: { reasoning?: { effort?: string; max_tokens?: number } }) =>
@@ -75,6 +76,16 @@ export type OpenrouterCompletionsInput = z.infer<typeof openrouterCompletionsInp
 
 export type OpenrouterChatCompletionsInput = z.infer<typeof openrouterChatCompletionsInputSchema>;
 
+const usageSchema = z.object({
+  completion_tokens: z.number().int(),
+  completion_tokens_details: z.any(),
+  cost: z.number(),
+  cost_details: z.any(),
+  prompt_tokens: z.number().int(),
+  prompt_tokens_details: z.any(),
+  total_tokens: z.number().int(),
+});
+
 export const openrouterCompletionsOutputSchema = z
   .object({
     id: z.string().nullable(),
@@ -89,6 +100,7 @@ export const openrouterCompletionsOutputSchema = z
           .passthrough(),
       )
       .nullable(),
+    usage: usageSchema.optional(),
   })
   .passthrough();
 
@@ -110,6 +122,8 @@ export const openrouterChatCompletionsOutputSchema = z
           .passthrough(),
       )
       .nullable(),
+    model: z.string(),
+    usage: usageSchema.optional(),
   })
   .passthrough();
 

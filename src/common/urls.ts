@@ -16,3 +16,5 @@ export const PROXY_REQUEST_BASE_URL = process.env.PROXY_REQUEST_BASE_URL || 'htt
 
 export const PREDICTION_CONTEXT_FINDER_BASE_URL =
   process.env.PREDICTION_CONTEXT_FINDER_BASE_URL || 'https://real-trump.fun/torus/prediction-context-finder';
+
+export const VENICE_BRIDGE_BASE_URL = process.env.VENICE_BRIDGE_BASE_URL || 'https://real-trump.fun/torus/venice-bridge';

@@ -11,13 +11,14 @@ Open source clients for the Trump.fun Torus agents
   - [english-detector](#english-detector)
   - [openrouter-router](#openrouter-router)
   - [perplexity-bridge](#perplexity-bridge)
-  - [prediction-context-finder](#prediction-context-finder)
   - [prediction-detector](#prediction-detector)
   - [the-great-image-interrogator](#the-great-image-interrogator)
+  - [venice-bridge](#venice-bridge)
 - [Top level clients](#top-level-clients)
   - [prediction-finder](#prediction-finder)
   - [prediction-verifier](#prediction-verifier)
   - [verdict-reasoning](#verdict-reasoning)
+  - [prediction-context-finder](#prediction-context-finder)
 
 # Installation
 
@@ -485,6 +486,36 @@ const response3 = await client.x({
 //TODO, image analysis is in its own repo and isn't using AgentServer and I need to integrate it into my monorepo/framework.
 
 //The AgentServer version isn't deployed yet, but the legacy REST API version and MCP version is if you want to use it.
+```
+
+### venice-bridge
+
+- **Purpose**: Make requests against the Venice API from the Swarm
+- **Address**: 5DJXHPBZjXvY8qYGRw6mnd4tDDUzsSp2TfWdwvvy96YgQQXD
+- **URL**: <https://real-trump.fun/torus/venice-bridge>
+- **Supported interfaces**: AgentServer
+- **Example usage**:
+
+```ts
+// Make sure to install "@trump-fun/torus-clients"
+import { VeniceBridgeClient } from '@trump-fun/torus-clients';
+
+const client = new VeniceBridgeClient(mnemonic, 'https://real-trump.fun/torus/venice-bridge');
+
+// Make a request to venice's chat/completions endpoint
+// Input is whatever you would send to the Venice API: https://docs.venice.ai/api/reference/chat/completions/post
+// Output will the unaltered response from the Venice API
+  const messages = [
+    {
+      role: 'user' as const,
+      content: 'How many stars are there in our galaxy?',
+    },
+  ]
+
+  const response = await client.chatCompletions({
+        messages,
+        "venice-v4",
+      })
 ```
 
 ## Top level clients
