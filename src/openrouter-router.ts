@@ -16,14 +16,18 @@ export class OpenrouterRouterClient {
     this.client = new AgentClient({ keypair, baseUrl });
   }
 
-  async completions(input: OpenrouterCompletionsInput): Promise<{
+  async completions(
+    input: OpenrouterCompletionsInput,
+    agentName = 'openrouter-router',
+    step = 'unknown',
+  ): Promise<{
     success: boolean;
     data?: OpenrouterCompletionsOutput;
     error?: string;
   }> {
     const response = await this.client.call({
       endpoint: 'completions',
-      data: input,
+      data: { ...input, agentName, step },
     });
 
     if (response.success) {
@@ -39,14 +43,18 @@ export class OpenrouterRouterClient {
     }
   }
 
-  async chatCompletions(input: OpenrouterChatCompletionsInput): Promise<{
+  async chatCompletions(
+    input: OpenrouterChatCompletionsInput,
+    agentName = 'openrouter-router',
+    step = 'unknown',
+  ): Promise<{
     success: boolean;
     data?: OpenrouterChatCompletionsOutput;
     error?: string;
   }> {
     const response = await this.client.call({
       endpoint: 'chat-completions',
-      data: input,
+      data: { ...input, agentName, step },
     });
 
     if (response.success) {

@@ -11,14 +11,18 @@ export class VeniceBridgeClient {
     this.client = new AgentClient({ keypair, baseUrl });
   }
 
-  async chatCompletions(input: VeniceChatCompletionsRequest): Promise<{
+  async chatCompletions(
+    input: VeniceChatCompletionsRequest,
+    agentName = 'venice-bridge',
+    step = 'unknown',
+  ): Promise<{
     success: boolean;
     data?: VeniceChatCompletionsResponse;
     error?: string;
   }> {
     const response = await this.client.call({
       endpoint: 'chat-completions',
-      data: input,
+      data: { ...input, agentName, step },
     });
 
     if (response.success) {

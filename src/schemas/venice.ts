@@ -210,6 +210,8 @@ export const veniceChatCompletionsRequestSchema = z.object({
     .describe(
       'A list of tools the model may call. Currently, only functions are supported as a tool. Use this to provide a list of functions the model may generate JSON inputs for.',
     ),
+  agentName: z.string().optional(),
+  step: z.string().optional(),
 });
 
 export type VeniceChatCompletionsRequest = z.infer<typeof veniceChatCompletionsRequestSchema>;

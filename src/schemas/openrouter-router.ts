@@ -42,6 +42,8 @@ const baseOpenrouterInput = {
   top_a: z.number().optional().describe('Alternate top sampling parameter (range: [0, 1]).'),
   user: z.string().optional().describe('A stable identifier for your end-users. Used to help detect and prevent abuse.'),
   response_format: z.any().optional(),
+  agentName: z.string().optional(),
+  step: z.string().optional(),
 };
 
 const refinement = (data: { reasoning?: { effort?: string; max_tokens?: number } }) =>
