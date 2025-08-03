@@ -12,6 +12,7 @@ Open source clients for the Trump.fun Torus agents
   - [openrouter-router](#openrouter-router)
   - [perplexity-bridge](#perplexity-bridge)
   - [prediction-detector](#prediction-detector)
+  - [prediction-verifiability-checker](#prediction-verifiability-checker)
   - [the-great-image-interrogator](#the-great-image-interrogator)
   - [venice-bridge](#venice-bridge)
 - [Top level clients](#top-level-clients)
