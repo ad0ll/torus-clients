@@ -1,5 +1,11 @@
 # @trump-fun/torus-clients
 
+## 1.4.3
+
+### Patch Changes
+
+- Remove mustFindPrediction and set logging to disabled by default in torus-swarm-memory
+
 ## 1.4.2
 
 ### Patch Changes
