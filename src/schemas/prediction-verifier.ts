@@ -2,13 +2,18 @@ import { z } from 'zod';
 
 import { PredictionOutcome, predictionOutcomeSchema } from './torus-swarm-memory';
 
+export const llmProviderSchema = z.enum(['openrouter', 'venice']);
+export type LlmProvider = z.infer<typeof llmProviderSchema>;
+
 export const predictionVerifierVerifySwarmPredictionInputSchema = z.object({
   predictionId: z.number().describe('The swarm memory prediction id to fetch, verify, and create a prediction claim for'),
+  llmProvider: llmProviderSchema.default('venice'),
 });
 
 export const predictionVerifierVerifyRawPredictionInputSchema = z.object({
   prediction: z.string().describe('the prediction text to verify'),
   context: z.record(z.string(), z.any()).optional(),
+  llmProvider: llmProviderSchema.default('venice'),
 });
 
 const verificationResultSchema = z.object({
@@ -22,13 +27,17 @@ const verificationResultSchema = z.object({
 
 export const predictionVerifierVerifyRawPredictionOutputSchema = verificationResultSchema.extend({
   prediction: z.string().describe('The prediction text that was processed'),
+  llmProvider: llmProviderSchema,
 });
 
-export const predictionVerifierScheduledInputSchema = z.object({});
+export const predictionVerifierScheduledInputSchema = z.object({
+  llmProvider: llmProviderSchema.default('venice'),
+});
 
 export const predictionVerifierVerifySwarmPredictionOutputSchema = verificationResultSchema.extend({
   prediction_id: z.number().int().describe('The ID of the prediction that this verification claim is for'),
   full_post: z.string().optional().describe('The full post text from swarm memory'),
+  llmProvider: llmProviderSchema,
 });
 
 export const predictionVerifierScheduledOutputSchema = z.array(predictionVerifierVerifySwarmPredictionOutputSchema);

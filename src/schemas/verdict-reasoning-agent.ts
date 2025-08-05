@@ -2,6 +2,7 @@ import { z } from 'zod';
 
 export const verdictReasoningAgentCreatePredictionVerdictInputSchema = z.object({
   predictionId: z.number().int().positive(),
+  llmProvider: z.enum(['openrouter', 'perplexity', 'venice']).optional().default('venice'),
 });
 
 export const verdictReasoningAgentCreatePredictionVerdictOutputSchema = z
@@ -13,6 +14,7 @@ export const verdictReasoningAgentCreatePredictionVerdictOutputSchema = z
     prediction_verification_claim_id: z.number().int().positive(),
     reasoning: z.string(),
     verdict: z.boolean(),
+    llmProvider: z.enum(['openrouter', 'perplexity', 'venice']).optional(),
   })
   .nullable();
 
@@ -21,7 +23,9 @@ export const verdictReasoningAgentCreatePredictionVerdictErrorSchema = z.object(
   error: z.string(),
 });
 
-export const verdictReasoningAgentScheduledInputSchema = z.object({});
+export const verdictReasoningAgentScheduledInputSchema = z.object({
+  llmProvider: z.enum(['openrouter', 'perplexity', 'venice']).optional().default('venice'),
+});
 
 export const verdictReasoningAgentScheduledOutputSchema = z.array(
   z.union([verdictReasoningAgentCreatePredictionVerdictOutputSchema, verdictReasoningAgentCreatePredictionVerdictErrorSchema]),

@@ -1,5 +1,11 @@
 # @trump-fun/torus-clients
 
+## 1.5.0
+
+### Minor Changes
+
+- Add llmProvider argument to prediction-verifier and verdict-reasoning-agent
+
 ## 1.4.3
 
 ### Patch Changes

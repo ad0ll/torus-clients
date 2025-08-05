@@ -2,6 +2,7 @@ import { AgentClient, Keypair } from '@torus-network/sdk/agent-client';
 
 import { PREDICTION_VERIFIER_BASE_URL } from './common';
 import {
+  type PredictionVerifierScheduledInput,
   type PredictionVerifierScheduledOutput,
   type PredictionVerifierVerifyRawPredictionInput,
   type PredictionVerifierVerifyRawPredictionOutput,
@@ -68,7 +69,7 @@ export class PredictionVerifierClient {
     }
   }
 
-  async scheduled(): Promise<{
+  async scheduled(input: PredictionVerifierScheduledInput): Promise<{
     success: boolean;
     data?: PredictionVerifierScheduledOutput;
     error?: string;
@@ -76,7 +77,7 @@ export class PredictionVerifierClient {
     console.log('Running scheduled verification');
     const response = await this.client.call({
       endpoint: 'scheduled',
-      data: {},
+      data: input,
     });
     console.log('Scheduled verification response:', response);
 

@@ -645,11 +645,13 @@ const verifierClient = new PredictionVerifierClient(mnemonic);
 // Fetch then verify a prediction from the swarm memory, then insert a claim into the swarm memory
 const response = await verifierClient.verifySwarmPrediction({
   predictionId: 1,
+  llmProvider: 'openrouter', // Optional, can be 'openrouter', or 'venice'. Defaults to 'venice'.
 });
 
 // Verify a raw prediction, no impact on swarm memory
 const response2 = await verifierClient.verifyRawPrediction({
   prediction: 'I predict BTC will be $100,000 by the end of the 2025',
+  llmProvider: 'openrouter', // Optional, can be 'openrouter', or 'venice'. Defaults to 'venice'.
 });
 ```
 
@@ -669,6 +671,7 @@ const client = new VerdictReasoningAgentClient(mnemonic);
 
  const response = await verdictReasoningClient.makeVerdict({
         predictionId: 1,
+        llmProvider: 'openrouter', // Optional, can be 'openrouter', 'perplexity', or 'venice'. Defaults to 'venice'.
       })
 ```
 
