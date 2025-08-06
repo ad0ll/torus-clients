@@ -4,7 +4,19 @@ const baseOpenrouterInput = {
   models: z.array(z.string()).optional().describe('Alternate list of models for routing overrides.'),
   provider: z
     .object({
-      sort: z.string().optional().describe('Sort preference (e.g., price, throughput).'),
+      order: z.array(z.string()).optional().describe('List of provider slugs to try in order (e.g. ["anthropic", "openai"])'),
+      allow_fallbacks: z.boolean().optional().default(true).describe('Whether to allow backup providers when the primary is unavailable'),
+      require_parameters: z.boolean().optional().default(false).describe('Only use providers that support all parameters in your request'),
+      data_collection: z
+        .enum(['allow', 'deny'])
+        .optional()
+        .default('deny')
+        .describe('Control whether to use providers that may store data'),
+      only: z.array(z.string()).optional().describe('List of provider slugs to allow for this request'),
+      ignore: z.array(z.string()).optional().describe('List of provider slugs to skip for this request'),
+      quantizations: z.array(z.string()).optional().describe('List of quantization levels to filter by (e.g. ["int4", "int8"])'),
+      sort: z.enum(['price', 'throughput']).optional().describe('Sort providers by price or throughput. (e.g. "price" or "throughput")'),
+      max_price: z.number().optional().describe('The maximum pricing you want to pay for this request'),
     })
     .optional()
     .describe('Preferences for provider routing.'),

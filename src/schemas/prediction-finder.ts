@@ -11,12 +11,32 @@ export type PredictionFinderOnDemandInputSchema = z.infer<typeof predictionFinde
 
 export type PredictionFinderScheduledInputSchema = z.infer<typeof predictionFinderScheduledInputSchema>;
 
-export const predictionFinderOnDemandOutputSchema = z.object({
+const baseOutputSchema = z.object({
+  processedTweets: z.number().int().gte(0),
+  insertedPredictions: z.number().int().gte(0),
+  rejectionCounts: z.object({
+    nonEnglish: z.number().int().gte(0),
+    notPrediction: z.number().int().gte(0),
+    notVerifiable: z.number().int().gte(0),
+    notHighConfidencePrediction: z.number().int().gte(0),
+    processingErrors: z.number().int().gte(0),
+  }),
+  cacheHits: z.number().int().gte(0),
+});
+
+export const predictionFinderOnDemandOutputSchema = baseOutputSchema.extend({
+  query: z.string(),
   status: z.string(),
+});
+
+const scheduledQueryOutputSchema = baseOutputSchema.extend({
+  query: z.string(),
 });
 
 export const predictionFinderScheduledOutputSchema = z.object({
   status: z.string(),
+  queries: z.array(scheduledQueryOutputSchema),
+  total: baseOutputSchema,
 });
 
 export type PredictionFinderOnDemandOutputSchema = z.infer<typeof predictionFinderOnDemandOutputSchema>;

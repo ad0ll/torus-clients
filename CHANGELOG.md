@@ -1,5 +1,11 @@
 # @trump-fun/torus-clients
 
+## 1.5.1
+
+### Patch Changes
+
+- Schema changes for prediction-finder
+
 ## 1.5.0
 
 ### Minor Changes
