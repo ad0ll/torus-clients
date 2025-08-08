@@ -1,5 +1,11 @@
 # @trump-fun/torus-clients
 
+## 1.5.2
+
+### Patch Changes
+
+- Adjust models
+
 ## 1.5.1
 
 ### Patch Changes
