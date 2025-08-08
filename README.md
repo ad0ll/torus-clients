@@ -307,7 +307,7 @@ const botDetectorClient = new BotDetectorClient(mnemonic, 'https://real-trump.fu
 
 const response = await botDetectorClient.scoreAuthor({
   entityId: '44196397', // elonmusk's id
-  model: 'openai/gpt-4.1-mini', //openrouter, default is openai/gpt-4.1-mini
+  model: 'openai/gpt-5-mini', //openrouter, default is openai/gpt-5-mini
   platform: 'x',
   options: {
     forceRecheck: false, //Bypass the cache to force a re-check, default is false, please use with caution
@@ -318,7 +318,7 @@ const response = await botDetectorClient.scoreAuthor({
 // Can score by username instead of id if you want
 const response2 = await client.scoreAuthor({
   entityUsername: 'elonmusk',
-  model: 'openai/gpt-4.1-mini', //openrouter, default is openai/gpt-4.1-mini
+  model: 'openai/gpt-5-mini', //openrouter, default is openai/gpt-5-mini
   platform: 'x',
   options: {
     forceRecheck: false, //Bypass the cache to force a re-check, default is false, please use with caution
@@ -329,7 +329,7 @@ const response2 = await client.scoreAuthor({
 // Also have a batch function for classifying multiple users at once
 const response3 = await botDetectorClient.scoreAuthorBatch({
   entityIds: ['44196397', '295218901'], // Elon, Vitalik,
-  model: 'openai/gpt-4.1-mini', //openrouter, default is openai/gpt-4.1-mini
+  model: 'openai/gpt-5-mini', //openrouter, default is openai/gpt-5-mini
   platform: 'x',
   options: {
     forceRecheck: false, //Bypass the cache to force a re-check, default is false, please use with caution
@@ -340,7 +340,7 @@ const response3 = await botDetectorClient.scoreAuthorBatch({
 // Batch also supports usernames
 const response4 = await client.scoreAuthorBatch({
   entityUsernames: ['elonmusk', 'VitalikButerin'],
-  model: 'openai/gpt-4.1-mini', //openrouter, default is openai/gpt-4.1-mini
+  model: 'openai/gpt-5-mini', //openrouter, default is openai/gpt-5-mini
   platform: 'x',
   options: {
     forceRecheck: false, //Bypass the cache to force a re-check, default is false, please use with caution
@@ -393,7 +393,7 @@ const client = new OpenrouterRouterClient(mnemonic, 'https://real-trump.fun/toru
 // See schema at bottom. OR, tl;dr, all parameters supported by openrouter's /completions endpoint are supported by this client: https://openrouter.ai/docs/api-reference/completion
 const response = await client.completions({
   prompt: 'Say hi to the humans',
-  model: 'openai/gpt-4.1-mini',
+  model: 'openai/gpt-5-mini',
 });
 
 // See schema at bottom. OR, tl;dr, all parameters supported by openrouter's /chat/completions endpoint are supported by this client: https://openrouter.ai/docs/api-reference/chat-completion
@@ -404,7 +404,7 @@ const response2 = await client.chatCompletions({
       content: 'Say hi to the humans',
     },
   ],
-  model: 'openai/gpt-4.1-mini',
+  model: 'openai/gpt-5-mini',
 });
 ```
 
@@ -517,20 +517,20 @@ const client = new PredictionDetectorClient(mnemonic);
 // Detect predictions in text
 const response = await client.text({
   text,
-  model, //openrouter model, default is openai/gpt-4.1-mini
+  model, //openrouter model, default is openai/gpt-5-mini
 });
 
 // Detect predictions in multiple texts at once.
 // Will not throw an error unless all texts fail
 const response = await client.textBatch({
   texts,
-  model, //openrouter model, default is openai/gpt-4.1-mini
+  model, //openrouter model, default is openai/gpt-5-mini
 });
 
 // Detect predictions in X posts, will not throw an error unless all posts fail
 const response3 = await client.x({ 
   postIds, 
-  model, //openrouter model, default is openai/gpt-4.1-mini
+  model, //openrouter model, default is openai/gpt-5-mini
   });
 ```
 

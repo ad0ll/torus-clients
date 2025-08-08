@@ -2,17 +2,17 @@ import z from 'zod';
 
 export const predictionDetectorTextInputSchema = z.object({
   text: z.string().min(1, 'Text cannot be empty').describe('The text to check for predictionness'),
-  model: z.string().optional().default('openai/gpt-4.1-mini').describe('The OpenRouter model name to use, e.g., "openai/gpt-4.1-mini".'),
+  model: z.string().optional().default('qwen/qwen3-30b-a3b-instruct-2507').describe('The OpenRouter model name to use, e.g., "qwen/qwen3-30b-a3b-instruct-2507".'),
 });
 
 export const predictionDetectorTextBatchInputSchema = z.object({
   texts: z.array(z.string().min(1)).min(1, 'Texts array cannot be empty').describe('An array of texts to check for predictionness'),
-  model: z.string().optional().default('openai/gpt-4.1-mini').describe('The OpenRouter model name to use, e.g., "openai/gpt-4.1-mini".'),
+  model: z.string().optional().default('qwen/qwen3-30b-a3b-instruct-2507').describe('The OpenRouter model name to use, e.g., "qwen/qwen3-30b-a3b-instruct-2507".'),
 });
 
 export const predictionDetectorXInputSchema = z.object({
   postIds: z.string().min(1, 'postIds cannot be empty').describe('A comma-separated list of tweet IDs to classify.'),
-  model: z.string().optional().default('openai/gpt-4.1-mini').describe('The OpenRouter model name to use, e.g., "openai/gpt-4.1-mini".'),
+  model: z.string().optional().default('qwen/qwen3-30b-a3b-instruct-2507').describe('The OpenRouter model name to use, e.g., "qwen/qwen3-30b-a3b-instruct-2507".'),
 });
 // This is entrypoint neutral, all functions return this or an array of this.
 export const predictionDetectorSingleItemOutputSchema = z.object({
