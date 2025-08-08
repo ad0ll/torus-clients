@@ -53,7 +53,22 @@ const baseOpenrouterInput = {
   min_p: z.number().optional().describe('Minimum probability threshold (range: [0, 1]).'),
   top_a: z.number().optional().describe('Alternate top sampling parameter (range: [0, 1]).'),
   user: z.string().optional().describe('A stable identifier for your end-users. Used to help detect and prevent abuse.'),
-  response_format: z.any().optional(),
+  response_format: z
+    .union([
+      z.object(
+        {
+          type: z.literal('json_schema'),
+          json_schema: z.object({
+            schema: z.any(),
+            strict: z.boolean().optional().nullable(),
+            name: z.string(),
+          }),
+        },
+        z.object({ type: z.string() }),
+      ),
+      z.any(),
+    ])
+    .optional(),
   agentName: z.string().optional(),
   step: z.string().optional(),
 };
