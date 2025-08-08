@@ -1,13 +1,13 @@
 import { AgentClient, Keypair } from '@torus-network/sdk/agent-client';
 
-import { PREDICTION_FINDER_BASE_URL } from './common';
+import { agentPublicConfigs } from './common';
 import { type PredictionFinderOnDemandInputSchema, type PredictionFinderScheduledInputSchema } from './schemas';
 
 export class PredictionFinderClient {
   private client: AgentClient;
 
   // Pass your own mnemonic here to use the prediction finder agent as your own agent
-  constructor(mnemonic: string, baseUrl: string = PREDICTION_FINDER_BASE_URL) {
+  constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['prediction-finder'].url) {
     const keypair = new Keypair(mnemonic);
     this.client = new AgentClient({ keypair, baseUrl });
   }

@@ -1,7 +1,7 @@
 // This is a reference Torus SDK client for the bot detection/author scoring service
 import { AgentClient, Keypair } from '@torus-network/sdk/agent-client';
 
-import { BOT_DETECTOR_BASE_URL } from './common';
+import { agentPublicConfigs } from './common';
 import {
   AuthorScorerScoreAuthorBatchInputSchema,
   AuthorScorerScoreAuthorBatchOutputSchema,
@@ -13,7 +13,7 @@ export class BotDetectorClient {
   private client: AgentClient;
 
   // Pass your own mnemonic here to use the bot detector agent as your own agent
-  constructor(mnemonic: string, baseUrl: string = BOT_DETECTOR_BASE_URL) {
+  constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['bot-detector'].url) {
     const keypair = new Keypair(mnemonic);
     this.client = new AgentClient({ keypair, baseUrl });
   }

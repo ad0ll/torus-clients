@@ -1,6 +1,6 @@
 import { AgentClient, Keypair } from '@torus-network/sdk/agent-client';
 
-import { PREDICTION_VERIFIER_BASE_URL } from './common';
+import { agentPublicConfigs } from './common';
 import {
   type PredictionVerifierScheduledInput,
   type PredictionVerifierScheduledOutput,
@@ -13,7 +13,7 @@ import {
 export class PredictionVerifierClient {
   private client: AgentClient;
 
-  constructor(mnemonic: string, baseUrl: string = PREDICTION_VERIFIER_BASE_URL) {
+  constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['prediction-verifier'].url) {
     const keypair = new Keypair(mnemonic);
     this.client = new AgentClient({ keypair, baseUrl });
     console.log('Prediction verifier client running against:', baseUrl);

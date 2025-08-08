@@ -1,7 +1,7 @@
 // This is a reference Torus SDK client for the english classification service
 import { AgentClient, Keypair } from '@torus-network/sdk/agent-client';
 
-import { ENGLISH_CLASSIFIER_BASE_URL } from './common';
+import { agentPublicConfigs } from './common';
 import {
   type EnglishClassifierIsEnglishBatchRequest,
   type EnglishClassifierIsEnglishBatchResponse,
@@ -13,7 +13,7 @@ export class EnglishClassifierClient {
   private client: AgentClient;
 
   // Pass your own mnemonic here to use the prediction detector agent as your own agent
-  constructor(mnemonic: string, baseUrl: string = ENGLISH_CLASSIFIER_BASE_URL) {
+  constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['english-classifier'].url) {
     const keypair = new Keypair(mnemonic);
     this.client = new AgentClient({ keypair, baseUrl });
   }

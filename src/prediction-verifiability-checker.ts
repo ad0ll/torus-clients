@@ -1,6 +1,6 @@
 import { AgentClient, Keypair } from '@torus-network/sdk/agent-client';
 
-import { PREDICTION_VERIFIABILITY_CHECKER_BASE_URL } from './common';
+import { agentPublicConfigs } from './common';
 import {
   CheckPredictionVerifiabilityInput,
   CheckPredictionVerifiabilityOutput,
@@ -11,7 +11,7 @@ import {
 export class PredictionVerifiabilityCheckerClient {
   private client: AgentClient;
 
-  constructor(mnemonic: string, baseUrl: string = PREDICTION_VERIFIABILITY_CHECKER_BASE_URL) {
+  constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['prediction-verifiability-checker'].url) {
     const keypair = new Keypair(mnemonic);
     this.client = new AgentClient({ keypair, baseUrl });
   }

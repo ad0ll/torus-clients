@@ -1,7 +1,7 @@
 import { AgentClient, Keypair } from '@torus-network/sdk/agent-client';
 import { z } from 'zod';
 
-import { PREDICTION_CONTEXT_FINDER_BASE_URL } from './common';
+import { agentPublicConfigs } from './common';
 import {
   type PredictionContextFinderFindContextInput,
   type PredictionContextFinderFindContextOutput,
@@ -13,7 +13,7 @@ import {
 export class PredictionContextFinderClient {
   private client: AgentClient;
 
-  constructor(mnemonic: string, baseUrl: string = PREDICTION_CONTEXT_FINDER_BASE_URL) {
+  constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['prediction-context-finder'].url) {
     const keypair = new Keypair(mnemonic);
     this.client = new AgentClient({ keypair, baseUrl });
   }

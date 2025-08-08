@@ -1,5 +1,11 @@
 # @trump-fun/torus-clients
 
+## 1.5.3
+
+### Patch Changes
+
+- Move agent config out of consts and into a shared object
+
 ## 1.5.2
 
 ### Patch Changes

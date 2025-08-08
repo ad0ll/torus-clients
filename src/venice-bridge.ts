@@ -1,12 +1,12 @@
 import { AgentClient, Keypair } from '@torus-network/sdk/agent-client';
 
-import { VENICE_BRIDGE_BASE_URL } from './common';
+import { agentPublicConfigs } from './common';
 import { type VeniceChatCompletionsRequest, type VeniceChatCompletionsResponse } from './schemas';
 
 export class VeniceBridgeClient {
   private client: AgentClient;
 
-  constructor(mnemonic: string, baseUrl: string = VENICE_BRIDGE_BASE_URL) {
+  constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['venice-bridge'].url) {
     const keypair = new Keypair(mnemonic);
     this.client = new AgentClient({ keypair, baseUrl });
   }

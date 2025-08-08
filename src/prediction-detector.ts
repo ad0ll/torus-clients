@@ -1,7 +1,7 @@
 // This is a reference Torus SDK client for the prediction detection service
 import { AgentClient, Keypair } from '@torus-network/sdk/agent-client';
 
-import { PREDICTION_DETECTOR_BASE_URL } from './common';
+import { agentPublicConfigs } from './common';
 import {
   type PredictionDetectorTextBatchInputSchema,
   type PredictionDetectorTextBatchOutputSchema,
@@ -15,7 +15,7 @@ export class PredictionDetectorClient {
   private client: AgentClient;
 
   // Pass your own mnemonic here to use the prediction detector agent as your own agent
-  constructor(mnemonic: string, baseUrl: string = PREDICTION_DETECTOR_BASE_URL) {
+  constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['prediction-detector'].url) {
     const keypair = new Keypair(mnemonic);
     this.client = new AgentClient({ keypair, baseUrl });
   }

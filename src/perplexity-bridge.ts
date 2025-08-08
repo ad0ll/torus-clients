@@ -1,6 +1,6 @@
 import { AgentClient, Keypair } from '@torus-network/sdk/agent-client';
 
-import { PERPLEXITY_BRIDGE_BASE_URL } from './common';
+import { agentPublicConfigs } from './common';
 import {
   type PerplexityBridgeChatCompletionsInput,
   type PerplexityBridgeChatCompletionsOutput,
@@ -11,7 +11,7 @@ import {
 export class PerplexityBridgeClient {
   private client: AgentClient;
 
-  constructor(mnemonic: string, baseUrl: string = PERPLEXITY_BRIDGE_BASE_URL) {
+  constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['perplexity-bridge'].url) {
     const keypair = new Keypair(mnemonic);
     this.client = new AgentClient({ keypair, baseUrl });
   }

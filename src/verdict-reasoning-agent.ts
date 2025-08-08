@@ -1,6 +1,6 @@
 import { AgentClient, Keypair } from '@torus-network/sdk/agent-client';
 
-import { VERDICT_REASONING_BASE_URL } from './common';
+import { agentPublicConfigs } from './common';
 import {
   type VerdictReasoningAgentCreatePredictionVerdictInput,
   type VerdictReasoningAgentCreatePredictionVerdictOutput,
@@ -11,7 +11,7 @@ import {
 export class VerdictReasoningAgentClient {
   private client: AgentClient;
 
-  constructor(mnemonic: string, baseUrl: string = VERDICT_REASONING_BASE_URL) {
+  constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['verdict-reasoning-agent'].url) {
     const keypair = new Keypair(mnemonic);
     console.log(`VerdictReasoningAgentClient sending requests to: ${baseUrl}`);
     this.client = new AgentClient({

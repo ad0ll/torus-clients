@@ -29,7 +29,7 @@ npm install @trump-fun/torus-clients
 
 ## Torus Swarm Memory Client
 
-> **⚠️ Warning:**  
+> **⚠️ Warning:**
 > This client is **temporary** and provided with **limited support** since Torus doesn't yet have Swarm Memory support in their SDK. Please reach out in a public channel on Torus if something is not working, do not DM me directly.
 > This client will be removed from this package once Torus has added client code for the Torus Swarm Memory API to their SDK.
 
@@ -38,7 +38,8 @@ npm install @trump-fun/torus-clients
 ```ts
 import { TorusSwarmMemoryClient } from '@trump-fun/torus-clients';
 
-const seedPhrase = "wow much private such secure very seed phrase cool security best practice"
+const seedPhrase =
+  'wow much private such secure very seed phrase cool security best practice';
 const client = new TorusSwarmMemoryClient({
   walletSeedPhrase: seedPhrase, //Required, the seed phrase for the wallet that you will use to authenticate with the Torus Swarm Memory API
   enableLogging: true, //Optional, default false, enables pino logging when true
@@ -119,7 +120,7 @@ Adds context to an existing prediction. (`POST /api/predictions/set-context`)
 ```ts
 const updatedPrediction = await client.setPredictionContext({
   prediction_id: 123,
-  context: "This prediction was made in response to a question about future BTC prices.",
+  context: 'This prediction was made in response to a question about future BTC prices.',
 });
 console.log(updatedPrediction);
 ```
@@ -136,8 +137,8 @@ import { PredictionOutcome } from '@trump-fun/torus-clients';
 const claim = await client.insertPredictionVerificationClaim({
   prediction_id: 123,
   outcome: PredictionOutcome.CORRECT,
-  reasoning: "BTC reached over $100,000 in December 2025.",
-  verification_url: "https://example.com/btc_price_chart"
+  reasoning: 'BTC reached over $100,000 in December 2025.',
+  verification_url: 'https://example.com/btc_price_chart',
 });
 console.log(claim);
 ```
@@ -147,7 +148,9 @@ console.log(claim);
 Lists verification claims, with pagination. (`GET /api/prediction-verification-claims/list`)
 
 ```ts
-const claims = await client.listPredictionVerificationClaims({ prediction_id: 123 });
+const claims = await client.listPredictionVerificationClaims({
+  prediction_id: 123,
+});
 console.log(claims);
 ```
 
@@ -174,7 +177,7 @@ import { PredictionOutcome } from '@trump-fun/torus-clients';
 const verdict = await client.upsertPredictionVerificationVerdict({
   prediction_id: 123,
   outcome: PredictionOutcome.CORRECT,
-  reasoning: "Based on multiple claims and data sources, the prediction is considered correct.",
+  reasoning: 'Based on multiple claims and data sources, the prediction is considered correct.',
 });
 console.log(verdict);
 ```
@@ -184,7 +187,9 @@ console.log(verdict);
 Lists verdicts, with pagination. (`GET /api/prediction-verification-verdicts/list`)
 
 ```ts
-const verdicts = await client.listPredictionVerificationVerdicts({ prediction_id: 123 });
+const verdicts = await client.listPredictionVerificationVerdicts({
+  prediction_id: 123,
+});
 console.log(verdicts);
 ```
 
@@ -207,10 +212,10 @@ Inserts a score for a piece of content. (`POST /api/content-scores/insert`)
 import { ContentType } from '@trump-fun/torus-clients';
 
 await client.insertContentScore({
-    content_id: 'tweet-12345',
-    content_type: ContentType.TWEET,
-    score: 0.85,
-    reasoning: "High quality content, well-researched."
+  content_id: 'tweet-12345',
+  content_type: ContentType.TWEET,
+  score: 0.85,
+  reasoning: 'High quality content, well-researched.',
 });
 ```
 
@@ -253,9 +258,9 @@ Inserts a new task into the queue. (`POST /api/tasks/insert`)
 
 ```ts
 const task = await client.insertTask({
-    name: 'verify-prediction-123',
-    description: 'Verify prediction with ID 123',
-    priority: 10,
+  name: 'verify-prediction-123',
+  description: 'Verify prediction with ID 123',
+  priority: 10,
 });
 console.log(task);
 ```
@@ -303,7 +308,10 @@ The following clients are low level building blocks designed to be used by top l
 // Make sure to install "@trump-fun/torus-clients"
 import { BotDetectorClient } from '@trump-fun/torus-clients';
 
-const botDetectorClient = new BotDetectorClient(mnemonic, 'https://real-trump.fun/torus/bot-detector');
+const botDetectorClient = new BotDetectorClient(
+  mnemonic,
+  'https://real-trump.fun/torus/bot-detector'
+);
 
 const response = await botDetectorClient.scoreAuthor({
   entityId: '44196397', // elonmusk's id
@@ -388,7 +396,10 @@ const response2 = await client.textBatch({
 // Make sure to install "@trump-fun/torus-clients"
 import { OpenrouterRouterClient } from '@trump-fun/torus-clients';
 
-const client = new OpenrouterRouterClient(mnemonic, 'https://real-trump.fun/torus/openrouter-router');
+const client = new OpenrouterRouterClient(
+  mnemonic,
+  'https://real-trump.fun/torus/openrouter-router'
+);
 
 // See schema at bottom. OR, tl;dr, all parameters supported by openrouter's /completions endpoint are supported by this client: https://openrouter.ai/docs/api-reference/completion
 const response = await client.completions({
@@ -420,36 +431,39 @@ const response2 = await client.chatCompletions({
 // Make sure to install "@trump-fun/torus-clients"
 import { PerplexityBridgeClient } from '@trump-fun/torus-clients';
 
-const client = new PerplexityBridgeClient(mnemonic, 'https://real-trump.fun/torus/perplexity-bridge');
+const client = new PerplexityBridgeClient(
+  mnemonic,
+  'https://real-trump.fun/torus/perplexity-bridge'
+);
 
 // Make a request to perplexity's chat/completions endpoint
 // Input is whatever you would send to the Perplexity API: https://docs.perplexity.ai/api-reference/chat-completions-post
 // Output will the unaltered response from the Perplexity API
-  const messages = [
-    {
-      role: 'user' as const,
-      content: 'How many stars are there in our galaxy?',
-    },
-  ]
+const messages = [
+  {
+    role: 'user' as const,
+    content: 'How many stars are there in our galaxy?',
+  },
+];
 
-  const response = await client.chatCompletionsRaw({
-        messages,
-        "sonar",
-      })
+const response = await client.chatCompletionsRaw({
+  messages,
+  sonar,
+});
 
 // Make a request to perplexity's chat/completions endpoint
 // Input is whatever you would send to the Perplexity API: https://docs.perplexity.ai/api-reference/chat-completions-post
 // Output will be a massaged response from Perplexity. See the schema for details.
-  const response = await client.chatCompletions({
-        messages,
-        "sonar-reasoning-pro",
-      })
+const response = await client.chatCompletions({
+  messages,
+  'sonar-reasoning-pro',
+});
 ```
 
 ### prediction-context-finder
 
 - **Purpose**: Finds surrounding context for a given prediction, particularly reply threads and retweet source posts on X
-- **Address**: 5DhgrJb2C4s2t6K2KH82pynDE7f6aJq6M5A4j3D2iA4L1sGV
+- **Address**: 5FhFGE4z1fnNas9izBjMrDK72qtFvFogcCe62SqZgKrBG2fT
 - **URL**: <https://real-trump.fun/torus/prediction-context-finder>
 - **Supported interfaces**: AgentServer
 - **Example usage**:
@@ -460,7 +474,7 @@ import { PredictionContextFinderClient } from '@trump-fun/torus-clients';
 
 const client = new PredictionContextFinderClient(mnemonic);
 
-// Find context for a given prediction from swarm memory. 
+// Find context for a given prediction from swarm memory.
 const response = await client.findPredictionContext({
   predictionId: 1,
   includeRaw: false, // A summary of context is always included, but if you want the raw data used for the summary, set this to true.
@@ -482,7 +496,7 @@ Example response for findPredictionContext:
 
 // Find context for some raw data on a supported platform
 const response2 = await client.findContext({
-  entityId: //The id of the entity on the platform, ex: the id of a tweet on X
+  entityId: 'The id of the entity on the platform, ex: the id of a tweet on X',
   platform: 'x', //Currently only "x" or "twitter", which do the same thing
   includeRaw: false, // A summary of context is always included, but if you want the raw data used for the summary, set this to true.
 });
@@ -528,10 +542,10 @@ const response = await client.textBatch({
 });
 
 // Detect predictions in X posts, will not throw an error unless all posts fail
-const response3 = await client.x({ 
-  postIds, 
+const response3 = await client.x({
+  postIds,
   model, //openrouter model, default is openai/gpt-5-mini
-  });
+});
 ```
 
 ### prediction-verifiability-checker
@@ -585,22 +599,25 @@ const response2 = await client.checkVerifiabilitySwarm({
 // Make sure to install "@trump-fun/torus-clients"
 import { VeniceBridgeClient } from '@trump-fun/torus-clients';
 
-const client = new VeniceBridgeClient(mnemonic, 'https://real-trump.fun/torus/venice-bridge');
+const client = new VeniceBridgeClient(
+  mnemonic,
+  'https://real-trump.fun/torus/venice-bridge'
+);
 
 // Make a request to venice's chat/completions endpoint
 // Input is whatever you would send to the Venice API: https://docs.venice.ai/api/reference/chat/completions/post
 // Output will the unaltered response from the Venice API
-  const messages = [
-    {
-      role: 'user' as const,
-      content: 'How many stars are there in our galaxy?',
-    },
-  ]
+const messages = [
+  {
+    role: 'user' as const,
+    content: 'How many stars are there in our galaxy?',
+  },
+];
 
-  const response = await client.chatCompletions({
-        messages,
-        "venice-v4",
-      })
+const response = await client.chatCompletions({
+  messages,
+  'venice-v4',
+});
 ```
 
 ## Top level clients
@@ -669,20 +686,21 @@ import { VerdictReasoningAgentClient } from '@trump-fun/torus-clients';
 
 const client = new VerdictReasoningAgentClient(mnemonic);
 
- const response = await verdictReasoningClient.makeVerdict({
-        predictionId: 1,
-        llmProvider: 'openrouter', // Optional, can be 'openrouter', 'perplexity', or 'venice'. Defaults to 'venice'.
-      })
+const response = await verdictReasoningClient.makeVerdict({
+  predictionId: 1,
+  llmProvider: 'openrouter', // Optional, can be 'openrouter', 'perplexity', or 'venice'. Defaults to 'venice'.
+});
 ```
 
 ## Additional content
 
 ### Addresses and Base URLs
 
-If you need to interact with the agents manually without using AgentClient, you can import the addresses and base urls for the clients with the following patterns:
+If you need to interact with the agents manually without using AgentClient, you can import the `agentPublicConfigs` object:
 
 ```ts
-//Import {AGENT_NAME}_ADDRESS and/or import {AGENT_NAME}_BASE_URL for the address and base url of the agent. 
-// For example, the prediction-finder agent's address and base url can be imported with:
-import { PREDICTION_FINDER_AGENT_ADDRESS, PREDICTION_FINDER_BASE_URL } from '@trump-fun/torus-clients';
+import { agentPublicConfigs } from '@trump-fun/torus-clients';
+
+const predictionFinderUrl = agentPublicConfigs['prediction-finder'].url;
+const predictionFinderAddress = agentPublicConfigs['prediction-finder'].address;
 ```

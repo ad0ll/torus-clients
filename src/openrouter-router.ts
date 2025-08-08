@@ -1,6 +1,6 @@
 import { AgentClient, Keypair } from '@torus-network/sdk/agent-client';
 
-import { OPENROUTER_ROUTER_BASE_URL } from './common';
+import { agentPublicConfigs } from './common';
 import {
   type OpenrouterChatCompletionsInput,
   type OpenrouterChatCompletionsOutput,
@@ -11,7 +11,7 @@ import {
 export class OpenrouterRouterClient {
   private client: AgentClient;
 
-  constructor(mnemonic: string, baseUrl: string = OPENROUTER_ROUTER_BASE_URL) {
+  constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['openrouter-router'].url) {
     const keypair = new Keypair(mnemonic);
     this.client = new AgentClient({ keypair, baseUrl });
   }
