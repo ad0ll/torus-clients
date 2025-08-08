@@ -1,5 +1,11 @@
 # @trump-fun/torus-clients
 
+## 1.5.5
+
+### Patch Changes
+
+- Add key stat to agent configs
+
 ## 1.5.4
 
 ### Patch Changes

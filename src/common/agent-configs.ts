@@ -14,20 +14,20 @@ export const agentPublicConfigs: Record<string, AgentPublicConfig> = {
     name: 'prediction-finder',
     url: process.env.PREDICTION_FINDER_BASE_URL || 'https://real-trump.fun/torus/prediction-finder',
     topLevel: true,
-    contributionKey: '',
+    contributionKey: 'num_predictions_submitted',
   },
   'prediction-detector': {
     address: '5GEUxJ9TpLQHfbaUAMx6RB4iJ2duLY7oswaXqn9rcEpAvWKQ' as SS58Address,
     name: 'prediction-detector',
     url: process.env.PREDICTION_DETECTOR_BASE_URL || 'https://real-trump.fun/torus/prediction-detector',
-    topLevel: true,
+    topLevel: false,
     contributionKey: '',
   },
   'bot-detector': {
     address: '5FCKLnjXSR8Dwe6AS93tnGvnAmDsnNqivvfWcjjsFEBC4i4V' as SS58Address,
     name: 'bot-detector',
     url: process.env.BOT_DETECTOR_BASE_URL || 'https://real-trump.fun/torus/bot-detector',
-    topLevel: true,
+    topLevel: false,
     contributionKey: '',
   },
   'prediction-verifier': {
@@ -35,7 +35,7 @@ export const agentPublicConfigs: Record<string, AgentPublicConfig> = {
     name: 'prediction-verifier',
     url: process.env.PREDICTION_VERIFIER_BASE_URL || 'https://real-trump.fun/torus/prediction-verifier',
     topLevel: true,
-    contributionKey: '',
+    contributionKey: 'num_verification_claims_submitted',
   },
   'openrouter-router': {
     address: '5EexhTdfBsLVE99HGS5mQEMj86FoejXHmhZstKajEX8CvotT' as SS58Address,
@@ -49,7 +49,7 @@ export const agentPublicConfigs: Record<string, AgentPublicConfig> = {
     name: 'verdict-reasoning-agent',
     url: process.env.VERDICT_REASONING_BASE_URL || 'https://real-trump.fun/torus/verdict-reasoning',
     topLevel: true,
-    contributionKey: '',
+    contributionKey: 'num_verification_verdicts_submitted',
   },
   'perplexity-bridge': {
     address: '5Dd8xNBAr4EkFTjgxovuvSimzFdZTH9gyn5Jn5DzC3HuXJFC' as SS58Address,
@@ -63,7 +63,7 @@ export const agentPublicConfigs: Record<string, AgentPublicConfig> = {
     name: 'prediction-context-finder',
     url: process.env.PREDICTION_CONTEXT_FINDER_BASE_URL || 'https://real-trump.fun/torus/prediction-context-finder',
     topLevel: true,
-    contributionKey: '',
+    contributionKey: 'num_prediction_contexts_added',
   },
   'venice-bridge': {
     address: '5DJXHPBZjXvY8qYGRw6mnd4tDDUzsSp2TfWdwvvy96YgQQXD' as SS58Address,
@@ -76,14 +76,14 @@ export const agentPublicConfigs: Record<string, AgentPublicConfig> = {
     address: '5DwEqYekMJV9C1hU4hk16bzhtGHbvbkMxJK5rNVFsAu5NwAD' as SS58Address,
     name: 'english-classifier',
     url: process.env.ENGLISH_CLASSIFIER_BASE_URL || 'https://real-trump.fun/torus/english-classifier',
-    topLevel: true,
+    topLevel: false,
     contributionKey: '',
   },
   'prediction-verifiability-checker': {
     address: '5FtHqr6o2w4Skv3RAcyAXhAiCwxsuEUaWUUkZF9WSPwUwa2U' as SS58Address,
     name: 'prediction-verifiability-checker',
     url: process.env.PREDICTION_VERIFIABILITY_CHECKER_BASE_URL || 'https://real-trump.fun/torus/prediction-verifiability-checker',
-    topLevel: true,
+    topLevel: false,
     contributionKey: '',
   },
 };
