@@ -1,5 +1,11 @@
 # @trump-fun/torus-clients
 
+## 1.5.4
+
+### Patch Changes
+
+- Refine openrouter response_format type
+
 ## 1.5.3
 
 ### Patch Changes
