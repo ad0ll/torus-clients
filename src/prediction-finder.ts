@@ -1,7 +1,11 @@
 import { AgentClient, Keypair } from '@torus-network/sdk/agent-client';
 
 import { agentPublicConfigs } from './common';
-import { type PredictionFinderOnDemandInputSchema, type PredictionFinderScheduledInputSchema } from './schemas';
+import {
+  type PredictionFinderOnDemandInputSchema,
+  type PredictionFinderScheduledInputSchema,
+  type PredictionFinderScheduledProphetFinderInputSchema,
+} from './schemas';
 
 export class PredictionFinderClient {
   private client: AgentClient;
@@ -46,6 +50,25 @@ export class PredictionFinderClient {
       return {
         success: false,
         error: response.error?.message || 'Failed to call scheduled endpoint',
+      };
+    }
+  }
+
+  async findPredictionsFromProphetFinderScheduled(input: PredictionFinderScheduledProphetFinderInputSchema) {
+    const response = await this.client.call({
+      endpoint: 'scheduled-prophet-finder',
+      data: input,
+    });
+
+    if (response.success) {
+      return {
+        success: true,
+        data: response.data,
+      };
+    } else {
+      return {
+        success: false,
+        error: response.error?.message || 'Failed to call scheduled-prophet-finder endpoint',
       };
     }
   }

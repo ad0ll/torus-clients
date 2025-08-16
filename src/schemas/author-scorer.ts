@@ -4,7 +4,7 @@ export const authorScorerScoreAuthorInputSchema = z.object({
   entityId: z.string().optional().describe('The user ID of the entity.'),
   entityUsername: z.string().optional().describe('The username of the entity.'),
   platform: z.enum(['x', 'twitter']).default('x'),
-  model: z.string().optional().default('openai/gpt-4.1-mini').describe('The OpenRouter model name to use, e.g., "openai/gpt-4.1-mini".'),
+  model: z.string().optional().default('qwen/qwen3-30b-a3b-instruct-2507').describe('The OpenRouter model name to use, e.g., "qwen/qwen3-30b-a3b-instruct-2507".'),
   options: z
     .object({
       forceRecheck: z.boolean().default(false),
@@ -18,7 +18,7 @@ export const authorScorerScoreAuthorBatchInputSchema = z
     entityIds: z.array(z.string()).optional().describe('An array of user IDs to check.'),
     entityUsernames: z.array(z.string()).optional().describe('An array of usernames to check.'),
     platform: z.enum(['x', 'twitter']).default('x'),
-    model: z.string().optional().default('openai/gpt-4.1-mini').describe('The OpenRouter model name to use, e.g., "openai/gpt-4.1-mini".'),
+    model: z.string().optional().default('qwen/qwen3-30b-a3b-instruct-2507').describe('The OpenRouter model name to use, e.g., "qwen/qwen3-30b-a3b-instruct-2507".'),
     options: z
       .object({
         forceRecheck: z.boolean().default(false),

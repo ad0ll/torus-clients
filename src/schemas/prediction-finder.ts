@@ -41,4 +41,14 @@ export const predictionFinderScheduledOutputSchema = z.object({
 
 export type PredictionFinderOnDemandOutputSchema = z.infer<typeof predictionFinderOnDemandOutputSchema>;
 
-export type PredictionFinderScheduledOutputSchema = z.infer<typeof predictionFinderScheduledOutputSchema>;
+export const predictionFinderScheduledProphetFinderInputSchema = z
+  .object({})
+  .describe('Input for the scheduled prophet finder. Takes no arguments.');
+
+export const predictionFinderScheduledProphetFinderOutputSchema = baseOutputSchema.extend({
+  status: z.string(),
+});
+
+export type PredictionFinderScheduledProphetFinderInputSchema = z.infer<typeof predictionFinderScheduledProphetFinderInputSchema>;
+
+export type PredictionFinderScheduledProphetFinderOutputSchema = z.infer<typeof predictionFinderScheduledProphetFinderOutputSchema>;
