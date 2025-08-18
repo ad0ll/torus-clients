@@ -1,5 +1,11 @@
 # @trump-fun/torus-clients
 
+## 1.5.6
+
+### Patch Changes
+
+- d8b9d58: Add fallback models to prediction detector's openrouter calls
+
 ## 1.5.5
 
 ### Patch Changes
