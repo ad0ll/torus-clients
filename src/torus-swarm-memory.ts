@@ -73,6 +73,7 @@ export class TorusSwarmMemoryClient {
   // and then logs the error w/o Axios noise and then throws it
   private async handleRequest<T>(config: AxiosRequestConfig): Promise<T> {
     try {
+      this.logger.debug({ config }, 'handleRequest params');
       const { data } = await axios<T>(config);
       return data;
     } catch (error) {
@@ -158,6 +159,7 @@ export class TorusSwarmMemoryClient {
       method: 'POST',
       url,
       data: payload,
+      headers: this.getHeaders(),
     });
     this.logger.debug({ data }, 'Received challenge response');
     return data;
@@ -172,6 +174,7 @@ export class TorusSwarmMemoryClient {
       method: 'POST',
       url,
       data: payload,
+      headers: this.getHeaders(),
     });
     this.logger.debug('Challenge verification successful');
     return data;
@@ -221,10 +224,12 @@ export class TorusSwarmMemoryClient {
   // GET /api/agent-contribution-stats
   async getAgentContributionStats(): Promise<AgentContributionStats[]> {
     const url = `${this.baseUrl}/agent-contribution-stats`;
+    await this.ensureAuthenticated();
     this.logger.info('Fetching agent contribution stats');
     const { agent_contribution_stats } = await this.handleRequest<AgentContributionStatsOutput>({
       method: 'GET',
       url,
+      headers: this.getHeaders(),
     });
     return agent_contribution_stats;
   }
@@ -232,6 +237,7 @@ export class TorusSwarmMemoryClient {
   // GET /api/content-scores/list
   async listContentScores(options: PaginationInput = {}): Promise<ContentScore[]> {
     paginationInputSchema.parse(options);
+    await this.ensureAuthenticated();
     const url = new URL(`${this.baseUrl}/content-scores/list`);
     if (options.limit) {
       url.searchParams.append('limit', String(options.limit));
@@ -253,6 +259,7 @@ export class TorusSwarmMemoryClient {
     return this.handleRequest<ContentScore[]>({
       method: 'GET',
       url: url.toString(),
+      headers: this.getHeaders(),
     });
   }
 
@@ -274,6 +281,7 @@ export class TorusSwarmMemoryClient {
   // GET /api/permissions/list
   async listPermissions(options: PaginationInput = {}): Promise<SwarmPermission[]> {
     paginationInputSchema.parse(options);
+    await this.ensureAuthenticated();
     const url = new URL(`${this.baseUrl}/permissions/list`);
 
     if (options.limit) {
@@ -296,6 +304,7 @@ export class TorusSwarmMemoryClient {
     return this.handleRequest<SwarmPermission[]>({
       method: 'GET',
       url: url.toString(),
+      headers: this.getHeaders(),
     });
   }
 
@@ -323,6 +332,8 @@ export class TorusSwarmMemoryClient {
   // GET /api/predictions/list
   async listPredictions(options: PaginationInput = {}): Promise<InsertPredictionOutput[]> {
     paginationInputSchema.parse(options);
+    await this.ensureAuthenticated();
+
     const url = new URL(`${this.baseUrl}/predictions/list`);
 
     if (options.limit) {
@@ -345,16 +356,19 @@ export class TorusSwarmMemoryClient {
     return this.handleRequest<InsertPredictionOutput[]>({
       method: 'GET',
       url: url.toString(),
+      headers: this.getHeaders(),
     });
   }
 
   // GET /api/predictions/{prediction_id}
   async getPredictionById(predictionId: number): Promise<InsertPredictionOutput | null> {
+    await this.ensureAuthenticated();
     const url = `${this.baseUrl}/predictions/${predictionId}`;
     this.logger.info(`Fetching prediction with ID: ${predictionId}`);
     return this.handleGetByIdRequest<InsertPredictionOutput>('Prediction', predictionId, {
       method: 'GET',
       url,
+      headers: this.getHeaders(),
     });
   }
 
@@ -399,6 +413,7 @@ export class TorusSwarmMemoryClient {
   // GET /api/prediction-verification-claims/list
   async listPredictionVerificationClaims(options: PaginationInput = {}): Promise<VerificationClaim[]> {
     paginationInputSchema.parse(options);
+    await this.ensureAuthenticated();
     const url = new URL(`${this.baseUrl}/prediction-verification-claims/list`);
     if (options.limit) {
       url.searchParams.append('limit', String(options.limit));
@@ -420,16 +435,19 @@ export class TorusSwarmMemoryClient {
     return this.handleRequest<VerificationClaim[]>({
       method: 'GET',
       url: url.toString(),
+      headers: this.getHeaders(),
     });
   }
 
   // GET /api/prediction-verification-claims/{claim_id}
   async getPredictionVerificationClaimById(claimId: number): Promise<VerificationClaim | null> {
+    await this.ensureAuthenticated();
     const url = `${this.baseUrl}/prediction-verification-claims/${claimId}`;
     this.logger.info(`Fetching prediction verification claim with ID: ${claimId}`);
     return this.handleGetByIdRequest<VerificationClaim>('VerificationClaim', claimId, {
       method: 'GET',
       url,
+      headers: this.getHeaders(),
     });
   }
 
@@ -454,6 +472,8 @@ export class TorusSwarmMemoryClient {
   // GET /api/prediction-verification-verdicts/list
   async listPredictionVerificationVerdicts(options: PaginationInput = {}): Promise<VerificationVerdict[]> {
     listPredictionVerificationVerdictsInputSchema.parse(options);
+    await this.ensureAuthenticated();
+
     const url = new URL(`${this.baseUrl}/prediction-verification-verdicts/list`);
     if (options.limit) {
       url.searchParams.append('limit', String(options.limit));
@@ -474,22 +494,26 @@ export class TorusSwarmMemoryClient {
     return this.handleRequest<VerificationVerdict[]>({
       method: 'GET',
       url: url.toString(),
+      headers: this.getHeaders(),
     });
   }
 
   // GET /api/prediction-verification-verdicts/{verdict_id}
   async getPredictionVerificationVerdictById(verdictId: number): Promise<VerificationVerdict | null> {
     const url = `${this.baseUrl}/prediction-verification-verdicts/${verdictId}`;
+    await this.ensureAuthenticated();
     this.logger.info(`Fetching prediction verification verdict with ID: ${verdictId}`);
     return this.handleGetByIdRequest<VerificationVerdict>('VerificationVerdict', verdictId, {
       method: 'GET',
       url,
+      headers: this.getHeaders(),
     });
   }
 
   // GET /api/tasks/list
   async listTasks(options: ListTasksInput): Promise<SwarmTask[]> {
     listTasksInputSchema.parse(options);
+    await this.ensureAuthenticated();
     const url = new URL(`${this.baseUrl}/tasks/list`);
     if (options.limit) {
       url.searchParams.append('limit', String(options.limit));
@@ -513,6 +537,7 @@ export class TorusSwarmMemoryClient {
     return this.handleRequest<SwarmTask[]>({
       method: 'GET',
       url: url.toString(),
+      headers: this.getHeaders(),
     });
   }
 
