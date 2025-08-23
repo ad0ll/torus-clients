@@ -1,5 +1,12 @@
 # @trump-fun/torus-clients
 
+## 1.6.0
+
+### Minor Changes
+
+- Force authentication on all get routes in swarm memory
+- Update swarm memory client to use authentication on all routes
+
 ## 1.5.7
 
 ### Patch Changes
