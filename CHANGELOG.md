@@ -1,5 +1,11 @@
 # @trump-fun/torus-clients
 
+## 1.5.7
+
+### Patch Changes
+
+- Support "provider" input param for prediction detector
+
 ## 1.5.6
 
 ### Patch Changes

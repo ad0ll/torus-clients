@@ -8,6 +8,11 @@ export const predictionDetectorTextInputSchema = z.object({
     .default('qwen/qwen3-30b-a3b-instruct-2507')
     .describe('The OpenRouter model name to use, e.g., "qwen/qwen3-30b-a3b-instruct-2507".'),
   models: z.array(z.string()).optional().describe('An array of OpenRouter model names to use as fallbacks.'),
+  provider: z
+    .enum(['openrouter', 'venice'])
+    .optional()
+    .default('openrouter')
+    .describe('The LLM provider to use, e.g., "openrouter" or "venice". When set to "venice", model + modelsis ignored.'),
 });
 
 export const predictionDetectorTextBatchInputSchema = z.object({
@@ -18,6 +23,7 @@ export const predictionDetectorTextBatchInputSchema = z.object({
     .default('qwen/qwen3-30b-a3b-instruct-2507')
     .describe('The OpenRouter model name to use, e.g., "qwen/qwen3-30b-a3b-instruct-2507".'),
   models: z.array(z.string()).optional().describe('An array of OpenRouter model names to use as fallbacks.'),
+  provider: z.enum(['openrouter', 'venice']).optional().default('openrouter'),
 });
 
 export const predictionDetectorXInputSchema = z.object({
@@ -28,6 +34,7 @@ export const predictionDetectorXInputSchema = z.object({
     .default('qwen/qwen3-30b-a3b-instruct-2507')
     .describe('The OpenRouter model name to use, e.g., "qwen/qwen3-30b-a3b-instruct-2507".'),
   models: z.array(z.string()).optional().describe('An array of OpenRouter model names to use as fallbacks.'),
+  provider: z.enum(['openrouter', 'venice']).optional().default('openrouter'),
 });
 // This is entrypoint neutral, all functions return this or an array of this.
 export const predictionDetectorSingleItemOutputSchema = z.object({
