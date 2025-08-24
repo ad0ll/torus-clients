@@ -25,14 +25,10 @@ export class VerdictReasoningAgentClient {
     data?: VerdictReasoningAgentCreatePredictionVerdictOutput;
     error?: string;
   }> {
-    console.log('input', input);
     const response = await this.client.call({
       endpoint: 'make-verdict',
       data: input,
     });
-    console.log('response for verdict', response);
-
-    console.log('response', response);
     if (response.success) {
       return {
         success: true,
@@ -42,30 +38,6 @@ export class VerdictReasoningAgentClient {
       return {
         success: false,
         error: response.error?.message || 'Failed to create verdict',
-      };
-    }
-  }
-
-  //Same exact function as makeVerdict, but with more gusto
-  async servePapers(input: VerdictReasoningAgentCreatePredictionVerdictInput): Promise<{
-    success: boolean;
-    data?: VerdictReasoningAgentCreatePredictionVerdictOutput;
-    error?: string;
-  }> {
-    const response = await this.client.call({
-      endpoint: 'serve-papers',
-      data: input,
-    });
-
-    if (response.success) {
-      return {
-        success: true,
-        data: response.data as VerdictReasoningAgentCreatePredictionVerdictOutput,
-      };
-    } else {
-      return {
-        success: false,
-        error: response.error?.message || 'Failed to serve papers',
       };
     }
   }
