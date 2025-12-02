@@ -18,6 +18,7 @@ export class PredictionDetectorClient {
   constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['prediction-detector'].url) {
     const keypair = new Keypair(mnemonic);
     this.client = new AgentClient({ keypair, baseUrl });
+    console.log('PredictionDetectorClient initialized at', baseUrl);
   }
 
   async text(input: PredictionDetectorTextInputSchema) {

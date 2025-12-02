@@ -16,6 +16,7 @@ export class BotDetectorClient {
   constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['bot-detector'].url) {
     const keypair = new Keypair(mnemonic);
     this.client = new AgentClient({ keypair, baseUrl });
+    console.log('BotDetectorClient initialized at', baseUrl);
   }
 
   async scoreAuthor(input: AuthorScorerScoreAuthorInputSchema) {

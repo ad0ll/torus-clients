@@ -9,6 +9,7 @@ export class VeniceBridgeClient {
   constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['venice-bridge'].url) {
     const keypair = new Keypair(mnemonic);
     this.client = new AgentClient({ keypair, baseUrl });
+    console.log('VeniceBridgeClient initialized at', baseUrl);
   }
 
   async chatCompletions(

@@ -14,6 +14,7 @@ export class PerplexityBridgeClient {
   constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['perplexity-bridge'].url) {
     const keypair = new Keypair(mnemonic);
     this.client = new AgentClient({ keypair, baseUrl });
+    console.log('PerplexityBridgeClient initialized at', baseUrl);
   }
 
   async chatCompletionsRaw(input: PerplexityBridgeChatCompletionsRawInput): Promise<{

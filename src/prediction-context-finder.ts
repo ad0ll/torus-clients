@@ -16,6 +16,7 @@ export class PredictionContextFinderClient {
   constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['prediction-context-finder'].url) {
     const keypair = new Keypair(mnemonic);
     this.client = new AgentClient({ keypair, baseUrl });
+    console.log('PredictionContextFinderClient initialized at', baseUrl);
   }
 
   async findContext(input: PredictionContextFinderFindContextInput): Promise<{

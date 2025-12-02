@@ -16,7 +16,7 @@ export class PredictionVerifierClient {
   constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['prediction-verifier'].url) {
     const keypair = new Keypair(mnemonic);
     this.client = new AgentClient({ keypair, baseUrl });
-    console.log('Prediction verifier client running against:', baseUrl);
+    console.log('PredictionVerifierClient initialized at', baseUrl);
   }
 
   async verifySwarmPrediction(input: PredictionVerifierVerifySwarmPredictionInput): Promise<{

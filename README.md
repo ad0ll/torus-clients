@@ -87,10 +87,11 @@ Inserts a new prediction into Swarm Memory. (`POST /api/predictions/insert`)
 
 ```ts
 const response = await client.insertPrediction({
-  full_post: 'I predict BTC will be $100,000 by the end of the 2025',
-  url: 'https://x.com/user/status/123',
-  platform: 'x',
-  prediction_text: 'BTC will be $100,000 by the end of the 2025',
+  prediction: 'BTC will be $100,000 by the end of 2025',
+  topic: 'finance',
+  tweet_id: 123, // Database ID of the tweet containing the prediction
+  context: null, // Optional context for the prediction
+  task_id: null, // Optional task ID that led to finding this prediction
 });
 console.log(response);
 ```
@@ -299,7 +300,7 @@ The following clients are low level building blocks designed to be used by top l
 ### author-scorer-and-bot-detector
 
 - **Purpose**: Classification step that gives you a quality score for a given content creator and tells you the likelihood that the user is a bot
-- **URL**: <https://real-trump.fun/torus/bot-detector>
+- **URL**: <https://trumptor.com/torus/bot-detector>
 - **Address**: 5FCKLnjXSR8Dwe6AS93tnGvnAmDsnNqivvfWcjjsFEBC4i4V
 - **Supported interfaces**: REST, Torus AgentServer
 - **Example usage**:
@@ -310,7 +311,7 @@ import { BotDetectorClient } from '@trump-fun/torus-clients';
 
 const botDetectorClient = new BotDetectorClient(
   mnemonic,
-  'https://real-trump.fun/torus/bot-detector'
+  'https://trumptor.com/torus/bot-detector'
 );
 
 const response = await botDetectorClient.scoreAuthor({
@@ -361,7 +362,7 @@ const response4 = await client.scoreAuthorBatch({
 
 - **Purpose**: Classification step that checks if the provided text is in english to save on LLM tokens
 - **Address**: 5DwEqYekMJV9C1hU4hk16bzhtGHbvbkMxJK5rNVFsAu5NwAD
-- **URL**: <https://real-trump.fun/torus/english-classifier>
+- **URL**: <https://trumptor.com/torus/english-classifier>
 - **Supported interfaces**: Torus AgentServer
 - **Example usage**:
 
@@ -388,7 +389,7 @@ const response2 = await client.textBatch({
 
 - **Purpose**: Routes requests to a managed openrouter model
 - **Address**: 5EexhTdfBsLVE99HGS5mQEMj86FoejXHmhZstKajEX8CvotT
-- **URL**: <https://real-trump.fun/torus/openrouter-router>
+- **URL**: <https://trumptor.com/torus/openrouter-router>
 - **Supported interfaces**: AgentServer
 - **Example usage**:
 
@@ -398,7 +399,7 @@ import { OpenrouterRouterClient } from '@trump-fun/torus-clients';
 
 const client = new OpenrouterRouterClient(
   mnemonic,
-  'https://real-trump.fun/torus/openrouter-router'
+  'https://trumptor.com/torus/openrouter-router'
 );
 
 // See schema at bottom. OR, tl;dr, all parameters supported by openrouter's /completions endpoint are supported by this client: https://openrouter.ai/docs/api-reference/completion
@@ -423,7 +424,7 @@ const response2 = await client.chatCompletions({
 
 - **Purpose**: Make requests against the Perplexity API from the Swarm
 - **Address**: 5Dd8xNBAr4EkFTjgxovuvSimzFdZTH9gyn5Jn5DzC3HuXJFC
-- **URL**: <https://real-trump.fun/torus/perplexity-bridge>
+- **URL**: <https://trumptor.com/torus/perplexity-bridge>
 - **Supported interfaces**: AgentServer
 - **Example usage**:
 
@@ -433,7 +434,7 @@ import { PerplexityBridgeClient } from '@trump-fun/torus-clients';
 
 const client = new PerplexityBridgeClient(
   mnemonic,
-  'https://real-trump.fun/torus/perplexity-bridge'
+  'https://trumptor.com/torus/perplexity-bridge'
 );
 
 // Make a request to perplexity's chat/completions endpoint
@@ -464,7 +465,7 @@ const response = await client.chatCompletions({
 
 - **Purpose**: Finds surrounding context for a given prediction, particularly reply threads and retweet source posts on X
 - **Address**: 5FhFGE4z1fnNas9izBjMrDK72qtFvFogcCe62SqZgKrBG2fT
-- **URL**: <https://real-trump.fun/torus/prediction-context-finder>
+- **URL**: <https://trumptor.com/torus/prediction-context-finder>
 - **Supported interfaces**: AgentServer
 - **Example usage**:
 
@@ -519,7 +520,7 @@ Example response:
 
 - **Purpose**:Lightweight LLM classifier step that tells you if the provided text, texts, or X posts contain a prediction to filter out irrelevant content
 - **Address**: 5GEUxJ9TpLQHfbaUAMx6RB4iJ2duLY7oswaXqn9rcEpAvWKQ
-- **URL**: <https://real-trump.fun/torus/prediction-detector>
+- **URL**: <https://trumptor.com/torus/prediction-detector>
 - **Supported interfaces**: REST, Torus AgentServer
 - **Example usage**:
 
@@ -552,7 +553,7 @@ const response3 = await client.x({
 
 - **Purpose**: A classification step that checks if a given prediction is specific, falsifiable, and can be proven true or false.
 - **Address**: 5FtHqr6o2w4Skv3RAcyAXhAiCwxsuEUaWUUkZF9WSPwUwa2U
-- **URL**: <https://real-trump.fun/torus/prediction-verifiability-checker>
+- **URL**: <https://trumptor.com/torus/prediction-verifiability-checker>
 - **Supported interfaces**: REST, Torus AgentServer
 - **Example usage**:
 
@@ -576,9 +577,9 @@ const response2 = await client.checkVerifiabilitySwarm({
 
 - **Purpose**: Performs common image analysis tasks such as OCR, label and object detection, celebrity recognition, and LLM captioning
 - **Address**: 5HVXyScRKkC5hvJ3VhWmD1UGdy1YXgAHLTpR63XpA8YcNBaY
-- **URL**: <https://real-trump.fun/torus/image-analysis>
+- **URL**: <https://trumptor.com/torus/image-analysis>
 - **Supported interfaces**: REST, MCP
-- **Notion**: [Here, has reference curls and MCP examples and instructions](https://www.notion.so/the-great-image-interrogator-23390dd606c18076bbd4e93df0a23564). This one uniquely [also has Swagger docs here](https://real-trump.fun/image-analysis/)
+- **Notion**: [Here, has reference curls and MCP examples and instructions](https://www.notion.so/the-great-image-interrogator-23390dd606c18076bbd4e93df0a23564). This one uniquely [also has Swagger docs here](https://trumptor.com/image-analysis/)
 - **Example usage**:
 
 ```ts
@@ -591,7 +592,7 @@ const response2 = await client.checkVerifiabilitySwarm({
 
 - **Purpose**: Make requests against the Venice API from the Swarm
 - **Address**: 5DJXHPBZjXvY8qYGRw6mnd4tDDUzsSp2TfWdwvvy96YgQQXD
-- **URL**: <https://real-trump.fun/torus/venice-bridge>
+- **URL**: <https://trumptor.com/torus/venice-bridge>
 - **Supported interfaces**: AgentServer
 - **Example usage**:
 
@@ -601,7 +602,7 @@ import { VeniceBridgeClient } from '@trump-fun/torus-clients';
 
 const client = new VeniceBridgeClient(
   mnemonic,
-  'https://real-trump.fun/torus/venice-bridge'
+  'https://trumptor.com/torus/venice-bridge'
 );
 
 // Make a request to venice's chat/completions endpoint
@@ -630,7 +631,7 @@ Note, if you look at the source code, you'll notice most clients have a "schedul
 
 - **Purpose**: Finds predictions on X and stores them in the swarm memory
 - **Address**: 5ExhSX83sbkorNwpBTZL3pBxX6PDMB2kKZjvwkMxpNKCP2Yh
-- **URL**: <https://real-trump.fun/torus/prediction-finder>
+- **URL**: <https://trumptor.com/torus/prediction-finder>
 - **Supported interfaces**: AgentServer
 - **Example usage**:
 
@@ -649,7 +650,7 @@ const response = await client.findPredictionsOnDemand({
 
 - **Purpose**: Checks if a given prediction was correct or not after the fact
 - **Address**: 5GKvHYoaKKr6jWYM7FiUY6i7JZsaUfXrCdfEhFL89BxnCTCB
-- **URL**: <https://real-trump.fun/torus/prediction-verifier>
+- **URL**: <https://trumptor.com/torus/prediction-verifier>
 - **Supported interfaces**: AgentServer
 - **Example usage**:
 
@@ -676,7 +677,7 @@ const response2 = await verifierClient.verifyRawPrediction({
 
 - **Purpose**: Analyzes a predictions verification claims and upserts a verdict to the swarm memory
 - **Address**: 5HTkSenPbzHNHSajcczw9jdXmAAopZ95crVPKpHw1wi4qdY5
-- **Remote address**: <https://real-trump.fun/torus/verdict-reasoning>
+- **Remote address**: <https://trumptor.com/torus/verdict-reasoning>
 - **Supported interfaces**: AgentServer
 - **Example usage**:
 

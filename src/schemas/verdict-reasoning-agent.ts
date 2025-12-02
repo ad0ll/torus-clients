@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { predictionOutcomeSchema } from './torus-swarm-memory';
+
 export const verdictReasoningAgentCreatePredictionVerdictInputSchema = z.object({
   predictionId: z.number().int().positive(),
   llmProvider: z.enum(['openrouter', 'perplexity', 'venice']).optional().default('venice'),
@@ -11,9 +13,9 @@ export const verdictReasoningAgentCreatePredictionVerdictOutputSchema = z
     inserted_at: z.string(),
     inserted_by_address: z.string(),
     prediction_id: z.number().int().positive(),
-    prediction_verification_claim_id: z.number().int().positive(),
+    prediction_verification_claim_id: z.number().int().positive().nullable(),
     reasoning: z.string(),
-    verdict: z.boolean(),
+    outcome: predictionOutcomeSchema,
     llmProvider: z.enum(['openrouter', 'perplexity', 'venice']).optional(),
   })
   .nullable();

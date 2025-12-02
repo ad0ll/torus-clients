@@ -4,6 +4,7 @@ export const CheckPredictionVerifiabilityInputSchema = z.object({
   prediction: z.string(),
   context: z.any().optional(),
   includeRawContext: z.boolean().optional().default(false),
+  provider: z.enum(['venice', 'openrouter']).optional().default('venice'),
 });
 
 export const CheckPredictionVerifiabilityOutputSchema = z.object({
@@ -19,6 +20,7 @@ export type CheckPredictionVerifiabilityOutput = z.infer<typeof CheckPredictionV
 export const CheckVerifiabilitySwarmInputSchema = z.object({
   prediction_id: z.number(),
   includeRawContext: z.boolean().optional().default(false),
+  provider: z.enum(['venice', 'openrouter']).optional().default('venice'),
 });
 
 export const CheckVerifiabilitySwarmOutputSchema = CheckPredictionVerifiabilityOutputSchema.extend({

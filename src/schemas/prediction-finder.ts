@@ -1,5 +1,7 @@
 import z from 'zod';
 
+import { swarmTweetSchema } from './torus-swarm-memory';
+
 export const predictionFinderOnDemandInputSchema = z.object({
   query: z.string().describe('The search query for finding predictions.'),
   platform: z.enum(['x', 'twitter']).describe('The platform to search on. Currently only "x" and "twitter" are supported.'),
@@ -11,16 +13,23 @@ export type PredictionFinderOnDemandInputSchema = z.infer<typeof predictionFinde
 
 export type PredictionFinderScheduledInputSchema = z.infer<typeof predictionFinderScheduledInputSchema>;
 
+export const rejectionReasonSchema = z.enum([
+  'nonEnglish',
+  'doesntContainPrediction',
+  'lowConfidenceOnContainsPrediction',
+  'allPredictionsNotVerifiable',
+  'allPredictionsDuplicatePrediction',
+  'allPredictionsInvalid',
+  'processedWithoutNewPredictions',
+]);
+export type RejectionReason = z.infer<typeof rejectionReasonSchema>;
+
 const baseOutputSchema = z.object({
   processedTweets: z.number().int().gte(0),
+  tweetsWithValidPredictions: z.number().int().gte(0),
   insertedPredictions: z.number().int().gte(0),
-  rejectionCounts: z.object({
-    nonEnglish: z.number().int().gte(0),
-    notPrediction: z.number().int().gte(0),
-    notVerifiable: z.number().int().gte(0),
-    notHighConfidencePrediction: z.number().int().gte(0),
-    processingErrors: z.number().int().gte(0),
-  }),
+  rejectionCounts: z.record(rejectionReasonSchema, z.number().int().gte(0)),
+  processingErrors: z.number().int().gte(0),
   cacheHits: z.number().int().gte(0),
 });
 
@@ -52,3 +61,43 @@ export const predictionFinderScheduledProphetFinderOutputSchema = baseOutputSche
 export type PredictionFinderScheduledProphetFinderInputSchema = z.infer<typeof predictionFinderScheduledProphetFinderInputSchema>;
 
 export type PredictionFinderScheduledProphetFinderOutputSchema = z.infer<typeof predictionFinderScheduledProphetFinderOutputSchema>;
+
+export const tweetFinalStatusSchema = z.enum([
+  'processed_with_predictions', // At least one prediction was inserted
+  'processed_without_predictions', // Processed fully, but no predictions were inserted (all duplicates, unverifiable, etc.)
+  'rejected_nonEnglish',
+  'rejected_notPrediction',
+  'rejected_notHighConfidencePrediction',
+  'error', // A processing error occurred for this tweet
+]);
+export type TweetFinalStatus = z.infer<typeof tweetFinalStatusSchema>;
+
+export const tweetResultSchema = z.object({
+  tweetId: z.string(),
+  fullPost: z.string(),
+  insertedPredictionsCount: z.number(),
+  rejectionReason: rejectionReasonSchema.nullable(),
+  processingError: z.boolean(),
+  cacheHits: z.number(),
+});
+
+export type TweetResultSchema = z.infer<typeof tweetResultSchema>;
+
+export const predictionFinderProcessSwarmTweetsInputSchema = z.object({
+  swarmTweets: z.array(swarmTweetSchema).describe('Array of SwarmTweets to process for predictions.'),
+  queryName: z
+    .string()
+    .optional()
+    .default('prophet-finder')
+    .describe('Optional query name for processing metrics (default: prophet-finder).'),
+});
+
+export const predictionFinderProcessSwarmTweetsOutputSchema = baseOutputSchema.extend({
+  queryName: z.string(),
+  status: z.string(),
+  tweetResults: z.array(tweetResultSchema),
+});
+
+export type PredictionFinderProcessSwarmTweetsInputSchema = z.infer<typeof predictionFinderProcessSwarmTweetsInputSchema>;
+
+export type PredictionFinderProcessSwarmTweetsOutputSchema = z.infer<typeof predictionFinderProcessSwarmTweetsOutputSchema>;

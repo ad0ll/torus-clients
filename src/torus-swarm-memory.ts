@@ -23,9 +23,19 @@ import {
   insertPredictionVerificationClaimInputSchema,
   type InsertPredictionVerificationVerdictInput,
   insertPredictionVerificationVerdictInputSchema,
+  type InsertSwarmTweetInput,
+  insertSwarmTweetsInputSchema,
   type InsertTaskInput,
   insertTaskInputSchema,
+  type ListPredictionsInput,
+  listPredictionsInputSchema,
+  type ListPredictionVerificationClaimsInput,
+  listPredictionVerificationClaimsInputSchema,
   listPredictionVerificationVerdictsInputSchema,
+  type ListSwarmTweetIdsInput,
+  listSwarmTweetIdsInputSchema,
+  type ListSwarmTweetsInput,
+  listSwarmTweetsInputSchema,
   type ListTasksInput,
   listTasksInputSchema,
   type LogoutAllOutput,
@@ -36,10 +46,18 @@ import {
   setPredictionContextInputSchema,
   type SwarmPermission,
   type SwarmTask,
+  type SwarmTweet,
+  type SwarmTweetId,
   type VerificationClaim,
   type VerificationVerdict,
   type VerifyChallengeOutput,
 } from './schemas/torus-swarm-memory';
+
+interface RetryOptions {
+  attempts?: number; // >= 1, positive, default 1
+  failedAttemptBackOff?: number; // > 0, positive, default 3000, in milliseconds
+  timeout?: number; // >= 0, positive, default 0 (disabled), in milliseconds
+}
 
 export class TorusSwarmMemoryClient {
   private readonly baseUrl: string;
@@ -90,16 +108,55 @@ export class TorusSwarmMemoryClient {
   }
 
   // Separate variation of handleRequests that handles 404 errors gracefully.
-  private async handleGetByIdRequest<T>(entityName: string, id: number, config: AxiosRequestConfig): Promise<T | null> {
+  private async handleGetByIdRequest<T>(entityName: string, id: number | string, config: AxiosRequestConfig): Promise<T | null> {
     try {
       return await this.handleRequest<T>(config);
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 404) {
         this.logger.warn(`${entityName} with ID ${id} not found.`);
+        this.logger.warn(`${entityName} with ID ${id} not found.`);
         return null;
       }
       throw error;
     }
+  }
+
+  // Helper method to handle retry logic with exponential backoff
+  private async handleRequestWithRetry<T>(requestFn: () => Promise<T>, retryOptions: RetryOptions = {}): Promise<T> {
+    const attempts = Math.max(1, retryOptions.attempts ?? 1);
+    const backOffMs = Math.max(0, retryOptions.failedAttemptBackOff ?? 3000);
+    const timeoutMs = Math.max(0, retryOptions.timeout ?? 0);
+
+    for (let attempt = 1; attempt <= attempts; attempt++) {
+      try {
+        let requestPromise = requestFn();
+
+        // Add timeout if specified
+        if (timeoutMs > 0) {
+          const timeoutPromise = new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error(`Request timed out after ${timeoutMs}ms`)), timeoutMs),
+          );
+          requestPromise = Promise.race([requestPromise, timeoutPromise]);
+        }
+
+        return await requestPromise;
+      } catch (error) {
+        if (attempt === attempts) {
+          // This is the final attempt, throw the error
+          throw error;
+        }
+
+        this.logger.warn(`Request attempt ${attempt}/${attempts} failed, retrying in ${backOffMs}ms`, {
+          error: error instanceof Error ? error.message : String(error),
+        });
+
+        // Wait before retrying
+        await new Promise((resolve) => setTimeout(resolve, backOffMs));
+      }
+    }
+
+    // This should never be reached, but TypeScript needs it
+    throw new Error('Unexpected end of retry logic');
   }
 
   // Full authentication flow
@@ -135,6 +192,8 @@ export class TorusSwarmMemoryClient {
       !this.sessionToken || !this.tokenExpiration || this.tokenExpiration.getTime() - new Date().getTime() < 15 * 60 * 1000;
 
     if (shouldRefresh) {
+      this.logger.debug({ sessionToken: this.sessionToken, tokenExpiration: this.tokenExpiration }, 'Need to refresh auth token');
+      this.logger.info('Refreshing authentication token');
       await this.authenticate();
     }
   }
@@ -317,7 +376,7 @@ export class TorusSwarmMemoryClient {
       {
         predictionData,
       },
-      `Inserting prediction for ${predictionData.url}`,
+      `Inserting prediction for tweet_id ${predictionData.tweet_id}`,
     );
     const data = await this.handleRequest<InsertPredictionOutput>({
       method: 'POST',
@@ -325,51 +384,69 @@ export class TorusSwarmMemoryClient {
       data: predictionData,
       headers: this.getHeaders(),
     });
-    this.logger.info({ data }, `Successfully inserted prediction for ${predictionData.url}`);
+    this.logger.info({ data }, `Successfully inserted prediction for tweet_id ${predictionData.tweet_id}`);
     return data;
   }
 
   // GET /api/predictions/list
-  async listPredictions(options: PaginationInput = {}): Promise<InsertPredictionOutput[]> {
-    paginationInputSchema.parse(options);
+  async listPredictions(params: ListPredictionsInput = {}, options: RetryOptions = {}): Promise<InsertPredictionOutput[]> {
+    listPredictionsInputSchema.parse(params);
     await this.ensureAuthenticated();
 
     const url = new URL(`${this.baseUrl}/predictions/list`);
 
-    if (options.limit) {
-      url.searchParams.append('limit', String(options.limit));
+    if (params.limit) {
+      url.searchParams.append('limit', String(params.limit));
     }
-    if (options.offset) {
-      url.searchParams.append('offset', String(options.offset));
+    if (params.offset) {
+      url.searchParams.append('offset', String(params.offset));
     }
-    if (options.agent_address) {
-      url.searchParams.append('agent_address', options.agent_address);
+    if (params.agent_address) {
+      url.searchParams.append('agent_address', params.agent_address);
     }
-    if (options.from) {
-      url.searchParams.append('from', options.from);
+    if (params.from) {
+      url.searchParams.append('from', params.from);
     }
-    if (options.to) {
-      url.searchParams.append('to', options.to);
+    if (params.to) {
+      url.searchParams.append('to', params.to);
+    }
+    if (params.search) {
+      url.searchParams.append('search', params.search);
+    }
+    if (params.sort_by) {
+      url.searchParams.append('sort_by', params.sort_by);
+    }
+    if (params.sort_order) {
+      url.searchParams.append('sort_order', params.sort_order);
     }
 
-    this.logger.info(`Listing predictions with options: ${JSON.stringify(options)}`);
-    return this.handleRequest<InsertPredictionOutput[]>({
-      method: 'GET',
-      url: url.toString(),
-      headers: this.getHeaders(),
-    });
+    this.logger.info(`Listing predictions with params: ${JSON.stringify(params)}`);
+    return this.handleRequestWithRetry(
+      () =>
+        this.handleRequest<InsertPredictionOutput[]>({
+          method: 'GET',
+          url: url.toString(),
+          headers: this.getHeaders(),
+        }),
+      options,
+    );
   }
 
   // GET /api/predictions/{prediction_id}
-  async getPredictionById(predictionId: number): Promise<InsertPredictionOutput | null> {
+  async getPredictionById(predictionId: number, options: RetryOptions = {}): Promise<InsertPredictionOutput | null> {
     await this.ensureAuthenticated();
     const url = `${this.baseUrl}/predictions/${predictionId}`;
     this.logger.info(`Fetching prediction with ID: ${predictionId}`);
-    return this.handleGetByIdRequest<InsertPredictionOutput>('Prediction', predictionId, {
-      method: 'GET',
-      url,
-      headers: this.getHeaders(),
-    });
+
+    return this.handleRequestWithRetry(
+      () =>
+        this.handleGetByIdRequest<InsertPredictionOutput>('Prediction', predictionId, {
+          method: 'GET',
+          url,
+          headers: this.getHeaders(),
+        }),
+      options,
+    );
   }
 
   // POST /api/predictions/set-context
@@ -411,32 +488,42 @@ export class TorusSwarmMemoryClient {
   }
 
   // GET /api/prediction-verification-claims/list
-  async listPredictionVerificationClaims(options: PaginationInput = {}): Promise<VerificationClaim[]> {
-    paginationInputSchema.parse(options);
+  async listPredictionVerificationClaims(
+    params: ListPredictionVerificationClaimsInput = {},
+    options: RetryOptions = {},
+  ): Promise<VerificationClaim[]> {
+    listPredictionVerificationClaimsInputSchema.parse(params);
     await this.ensureAuthenticated();
     const url = new URL(`${this.baseUrl}/prediction-verification-claims/list`);
-    if (options.limit) {
-      url.searchParams.append('limit', String(options.limit));
+    if (params.limit) {
+      url.searchParams.append('limit', String(params.limit));
     }
-    if (options.offset) {
-      url.searchParams.append('offset', String(options.offset));
+    if (params.offset) {
+      url.searchParams.append('offset', String(params.offset));
     }
-    if (options.agent_address) {
-      url.searchParams.append('agent_address', options.agent_address);
+    if (params.agent_address) {
+      url.searchParams.append('agent_address', params.agent_address);
     }
-    if (options.from) {
-      url.searchParams.append('from', options.from);
+    if (params.from) {
+      url.searchParams.append('from', params.from);
     }
-    if (options.to) {
-      url.searchParams.append('to', options.to);
+    if (params.to) {
+      url.searchParams.append('to', params.to);
+    }
+    if (params.sort_order) {
+      url.searchParams.append('sort_order', params.sort_order);
     }
 
-    this.logger.info(`Listing prediction verification claims with options: ${JSON.stringify(options)}`);
-    return this.handleRequest<VerificationClaim[]>({
-      method: 'GET',
-      url: url.toString(),
-      headers: this.getHeaders(),
-    });
+    this.logger.info(`Listing prediction verification claims with params: ${JSON.stringify(params)}`);
+    return this.handleRequestWithRetry(
+      () =>
+        this.handleRequest<VerificationClaim[]>({
+          method: 'GET',
+          url: url.toString(),
+          headers: this.getHeaders(),
+        }),
+      options,
+    );
   }
 
   // GET /api/prediction-verification-claims/{claim_id}
@@ -581,5 +668,99 @@ export class TorusSwarmMemoryClient {
       data: insertTaskInput,
       headers: this.getHeaders(),
     });
+  }
+
+  // POST /api/tweets/insert
+  async insertSwarmTweets(tweets: InsertSwarmTweetInput[]): Promise<SwarmTweet[]> {
+    insertSwarmTweetsInputSchema.parse(tweets);
+    await this.ensureAuthenticated();
+    const url = `${this.baseUrl}/tweets/insert`;
+    this.logger.info(`Inserting ${tweets.length} tweets`);
+    return this.handleRequest<SwarmTweet[]>({
+      method: 'POST',
+      url,
+      data: tweets,
+      headers: this.getHeaders(),
+    });
+  }
+
+  // GET /api/tweets/{id}
+  async getSwarmTweetById(id: string, options: RetryOptions = {}): Promise<SwarmTweet | null> {
+    await this.ensureAuthenticated();
+    const url = `${this.baseUrl}/tweets/${id}`;
+    this.logger.info(`Fetching tweet with ID: ${id}`);
+    return this.handleRequestWithRetry(
+      () =>
+        this.handleGetByIdRequest<SwarmTweet>('Tweet', id, {
+          method: 'GET',
+          url,
+          headers: this.getHeaders(),
+        }),
+      options,
+    );
+  }
+
+  // GET /api/tweets/list
+  async listSwarmTweets(params: ListSwarmTweetsInput = {}, options: RetryOptions = {}): Promise<SwarmTweet[]> {
+    listSwarmTweetsInputSchema.parse(params);
+    await this.ensureAuthenticated();
+    const url = new URL(`${this.baseUrl}/tweets/list`);
+
+    if (params.limit) {
+      url.searchParams.append('limit', String(params.limit));
+    }
+    if (params.offset) {
+      url.searchParams.append('offset', String(params.offset));
+    }
+    if (params.agent_address) {
+      url.searchParams.append('agent_address', params.agent_address);
+    }
+    if (params.from) {
+      url.searchParams.append('from', params.from);
+    }
+    if (params.to) {
+      url.searchParams.append('to', params.to);
+    }
+    if (params.author_twitter_username) {
+      url.searchParams.append('author_twitter_username', params.author_twitter_username);
+    }
+    if (params.search) {
+      url.searchParams.append('search', params.search);
+    }
+    if (params.sort_order) {
+      url.searchParams.append('sort_order', params.sort_order);
+    }
+
+    this.logger.info(`Listing tweets with params: ${JSON.stringify(params)}`);
+    return this.handleRequestWithRetry(
+      () =>
+        this.handleRequest<SwarmTweet[]>({
+          method: 'GET',
+          url: url.toString(),
+          headers: this.getHeaders(),
+        }),
+      options,
+    );
+  }
+
+  // GET /api/tweets/ids
+  async listSwarmTweetIds(params: ListSwarmTweetIdsInput = {}, options: RetryOptions = {}): Promise<SwarmTweetId[]> {
+    listSwarmTweetIdsInputSchema.parse(params);
+    await this.ensureAuthenticated();
+    const url = new URL(`${this.baseUrl}/tweets/ids`);
+    if (params.author_twitter_username) {
+      url.searchParams.append('author_twitter_username', params.author_twitter_username);
+    }
+
+    this.logger.info(`Listing tweet IDs with params: ${JSON.stringify(params)}`);
+    return this.handleRequestWithRetry(
+      () =>
+        this.handleRequest<SwarmTweetId[]>({
+          method: 'GET',
+          url: url.toString(),
+          headers: this.getHeaders(),
+        }),
+      options,
+    );
   }
 }

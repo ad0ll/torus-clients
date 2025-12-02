@@ -6,7 +6,8 @@ export enum PredictionOutcome {
   MaturedTrue = 'MaturedTrue',
   MaturedFalse = 'MaturedFalse',
   MaturedMostlyTrue = 'MaturedMostlyTrue',
-  Unverifiable = 'Unverifiable',
+  Invalid = 'Invalid',
+  MissingContext = 'MissingContext',
 }
 
 export const predictionOutcomeSchema = z.nativeEnum(PredictionOutcome);
@@ -88,36 +89,78 @@ export const permissionSchema = z.object({
 });
 export const permissionsSchema = z.array(permissionSchema);
 
-// /api/predictions
-export const insertPredictionInputSchema = z.object({
-  full_post: z.string().describe('The full text of the post containing the prediction'),
-  prediction: z
-    .string()
-    .describe('The prediction contained in the post (must be extracted verbatim from the post, i.e. a substring of full_post)'),
-  prediction_timestamp: z.string().describe('The timestamp when the prediction was made (in RFC3339 format)'),
-  predictor_twitter_user_id: z
+// /api/tweets
+export const swarmTweetTypeSchema = z.enum(['post', 'reply', 'quote', 'retweet']);
+export const swarmTweetInputSchema = z.object({
+  author_twitter_user_id: z.string().nullable().describe("The author's 64-bit user snowflake ID (as a decimal string), if available"),
+  author_twitter_username: z.string().describe("The author's Twitter/X username (without '@')"),
+  conversation_id: z.string().nullable().describe('Conversation/thread identifier (snowflake as string), if provided by API'),
+  full_text: z.string().describe('The full text content of the tweet'),
+  in_reply_to_tweet_id: z.string().nullable().describe('If this tweet is a reply, the parent tweet ID (snowflake as string)'),
+  quoted_tweet_id: z.string().nullable().describe('If this tweet quotes another, the quoted tweet ID (snowflake as string)'),
+  raw_json: z.string().describe('Raw JSON payload as returned by the Twitter/X API for this tweet'),
+  retweeted_tweet_id: z.string().nullable().describe('If this tweet is a retweet, the retweeted tweet ID (snowflake as string)'),
+  tweet_id: z.string().describe("The Tweet's 64-bit snowflake ID (as a decimal string)"),
+  tweet_timestamp: z.string().describe('Timestamp when the tweet was created (RFC3339)'),
+  tweet_type: swarmTweetTypeSchema.describe('The tweet type: post | reply | quote | retweet'),
+  url: z.string().url().describe('The canonical URL of the tweet'),
+});
+export const insertSwarmTweetsInputSchema = z.array(swarmTweetInputSchema);
+export const swarmTweetSchema = swarmTweetInputSchema.extend({
+  id: z.number().int().describe('The internal row ID of the tweet'),
+  inserted_at: z.string().describe('The timestamp when the tweet was inserted'),
+  inserted_by_address: z.string().describe('The wallet address of the agent who inserted the tweet'),
+});
+export const listSwarmTweetsInputSchema = paginationInputSchema.extend({
+  author_twitter_username: z
     .string()
     .nullable()
-    .describe('User ID of the user who made the prediction (stays the same when username changes), optional (provide if available)'),
-  predictor_twitter_username: z.string().describe('The Twitter username of the user who made the prediction'),
-  task_id: z.number().nullable().describe('The ID of the task that led to finding this prediction'),
+    .optional()
+    .describe("Filter by author's Twitter/X username (with or without '@', case-insensitive)"),
+  search: z.string().nullable().optional().describe('Text search filter (case-insensitive, searches relevant content fields)'),
+  sort_order: z.enum(['asc', 'desc']).nullable().optional().describe('Sort order by ID/insertion timestamp (default: Asc)'),
+});
+export const listSwarmTweetIdsInputSchema = z.object({
+  author_twitter_username: z
+    .string()
+    .nullable()
+    .optional()
+    .describe("Filter by author's Twitter/X username (with or without '@', case-insensitive)"),
+});
+export const swarmTweetIdSchema = z.object({
+  id: z.number().int().describe('The internal row ID of the tweet'),
+  tweet_id: z.string().describe("The Tweet's 64-bit snowflake ID (as a decimal string)"),
+});
+
+// /api/predictions
+export const insertPredictionInputSchema = z.object({
+  context: z
+    .string()
+    .nullable()
+    .optional()
+    .describe(
+      'Optional context for the post, e.g. if the tweet is a reply in a thread, this should contain the preceding tweets in the thread. Context could also be previous tweets by same author, or context from a wider debate in a subcommunity.',
+    ),
+  prediction: z.string().describe('The prediction contained in the tweet (must be extracted verbatim from the tweet text)'),
+  task_id: z.number().int().nullable().optional().describe('The ID of the task that led to finding this prediction'),
   topic: z
     .string()
     .describe(
       'The topic of the prediction, can be empty (for now), but ideally should be descriptive on a high-level (e.g. politics, sports, entertainment, economy, tech, etc.)',
     ),
-  url: z.string().url().describe('The URL of the prediction'),
+  tweet_id: z.string().describe('Database identifier of the tweet that contains the prediction (foreign key to tweets.id)'),
 });
 export const verificationClaimSchema = z.object({
-  id: z.number(),
+  id: z.number().int(),
   inserted_at: z.string().describe('The timestamp when the verification claim was inserted'),
   inserted_by_address: z.string().describe('The wallet address of the agent who inserted the verification claim'),
+  is_latest_for_agent: z.boolean().describe('True if this is the latest claim by this agent for this prediction'),
   outcome: predictionOutcomeSchema.describe('The outcome of the prediction verification process'),
-  prediction_id: z.number().describe('The ID of the prediction that this verification claim is for'),
+  prediction_id: z.number().int().describe('The ID of the prediction that this verification claim is for'),
   proof: z
     .string()
     .describe(
-      'The proof for the verification claim (markdown text containing data, links to sources, reasoning). If outcome is `MostlyTrue` or `Unverifiable`, the proof contains details about which parts of the prediction are true/false/unverifiable.',
+      'The proof for the verification claim (markdown text containing data, links to sources, reasoning). If outcome is `MostlyTrue` or `Invalid`, the proof contains details about which parts of the prediction are true/false/invalid.',
     ),
 });
 export const setPredictionContextInputSchema = z.object({
@@ -126,27 +169,38 @@ export const setPredictionContextInputSchema = z.object({
 });
 export const predictionVerificationVerdictSchema = z.object({
   id: z.number().int(),
-  inserted_at: z.string(),
-  inserted_by_address: z.string(),
-  prediction_id: z.number().int(),
-  prediction_verification_claim_id: z.number().int(),
-  reasoning: z.string(),
-  verdict: z.boolean(),
+  inserted_at: z.string().describe('The timestamp when the verification verdict was inserted'),
+  inserted_by_address: z.string().describe('The wallet address of the agent who inserted the verification verdict'),
+  prediction_id: z.number().int().describe('The ID of the prediction that this verification verdict is for'),
+  prediction_verification_claim_id: z
+    .number()
+    .int()
+    .nullable()
+    .describe(
+      "The ID of the verification claim that this verdict most agrees with. If `null`, it means the verdict doesn't agree with any of the claims (evidence isn't clear enough to come to a verdict).",
+    ),
+  reasoning: z.string().describe('The reasoning for the verdict (markdown text)'),
 });
 export const insertPredictionOutputSchema = z.object({
-  id: z.number(),
-  context: z.string().nullable().describe('The context of the prediction, if it exists.'),
-  full_post: z.string().describe('The full text of the post containing the prediction'),
+  id: z.number().int(),
+  context: z
+    .string()
+    .nullable()
+    .describe('Optional context for the post, e.g. if the tweet is a reply in a thread, this contains the preceding tweets in the thread'),
   inserted_at: z.string().describe('The timestamp when the prediction was inserted'),
   inserted_by_address: z.string().describe('The wallet address of the agent who inserted the prediction'),
   prediction: z.string().describe('The prediction contained in the post (extracted verbatim from the post)'),
-  prediction_timestamp: z.string().describe('The timestamp when the prediction was made (in RFC3339 format)'),
-  predictor_twitter_user_id: z.string().nullable().describe('The Twitter ID of the user who made the prediction'),
-  predictor_twitter_username: z.string().describe("The Twitter username of the agent who made the prediction (without '@')"),
   topic: z.string().describe('The topic of the prediction'),
-  url: z.string().url().describe('The URL of the post containing the prediction'),
+  tweet: swarmTweetSchema.describe('The tweet that contains this prediction'),
   verification_claims: z.array(verificationClaimSchema).describe('The verification claims for the prediction'),
-  verification_verdict: predictionVerificationVerdictSchema.nullable(),
+  verification_verdict: predictionVerificationVerdictSchema
+    .nullable()
+    .describe('The verdict for the prediction, based on all its verification claims'),
+});
+export const listPredictionsInputSchema = paginationInputSchema.extend({
+  search: z.string().nullable().optional().describe('Text search filter (case-insensitive, searches relevant content fields)'),
+  sort_by: z.enum(['id', 'twitter_username']).nullable().optional().describe('Column to sort by'),
+  sort_order: z.enum(['asc', 'desc']).nullable().optional().describe('Sort order by ID/insertion timestamp (default: Asc)'),
 });
 
 // /api/prediction-verification-claims
@@ -160,12 +214,15 @@ export const insertPredictionVerificationClaimInputSchema = z.object({
     ),
 });
 
+export const listPredictionVerificationClaimsInputSchema = paginationInputSchema.extend({
+  sort_order: z.enum(['asc', 'desc']).nullable().optional().describe('Sort order by ID/insertion timestamp (default: Asc)'),
+});
+
 // /api/prediction-verification-verdicts
 export const insertPredictionVerificationVerdictInputSchema = z.object({
   prediction_id: z.number(),
-  prediction_verification_claim_id: z.number(),
+  prediction_verification_claim_id: z.number().nullable(),
   reasoning: z.string(),
-  verdict: z.boolean(),
 });
 export const listPredictionVerificationVerdictsInputSchema = paginationInputSchema;
 
@@ -205,7 +262,9 @@ export type InsertPredictionVerificationVerdictInput = z.infer<typeof insertPred
 export type SetPredictionContextInput = z.infer<typeof setPredictionContextInputSchema>;
 export type InsertPredictionOutput = z.infer<typeof insertPredictionOutputSchema>;
 export type PaginationInput = z.infer<typeof paginationInputSchema>;
+export type ListPredictionsInput = z.infer<typeof listPredictionsInputSchema>;
 export type InsertPredictionVerificationClaimInput = z.infer<typeof insertPredictionVerificationClaimInputSchema>;
+export type ListPredictionVerificationClaimsInput = z.infer<typeof listPredictionVerificationClaimsInputSchema>;
 export type AgentContributionStats = z.infer<typeof agentContributionStatsSchema>;
 export type AgentContributionStatsOutput = z.infer<typeof agentContributionStatsOutputSchema>;
 export const ContentType = contentTypeSchema.enum;
@@ -218,3 +277,8 @@ export type ListTasksInput = z.infer<typeof listTasksInputSchema>;
 export type ClaimTaskInput = z.infer<typeof claimTaskInputSchema>;
 export type InsertTaskInput = z.infer<typeof insertTaskInputSchema>;
 export type SwarmPermission = z.infer<typeof permissionSchema>;
+export type InsertSwarmTweetInput = z.infer<typeof swarmTweetInputSchema>;
+export type SwarmTweet = z.infer<typeof swarmTweetSchema>;
+export type ListSwarmTweetsInput = z.infer<typeof listSwarmTweetsInputSchema>;
+export type ListSwarmTweetIdsInput = z.infer<typeof listSwarmTweetIdsInputSchema>;
+export type SwarmTweetId = z.infer<typeof swarmTweetIdSchema>;

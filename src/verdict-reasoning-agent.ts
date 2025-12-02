@@ -13,11 +13,11 @@ export class VerdictReasoningAgentClient {
 
   constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['verdict-reasoning-agent'].url) {
     const keypair = new Keypair(mnemonic);
-    console.log(`VerdictReasoningAgentClient sending requests to: ${baseUrl}`);
     this.client = new AgentClient({
       keypair,
       baseUrl,
     });
+    console.log('VerdictReasoningAgentClient initialized at', baseUrl);
   }
 
   async makeVerdict(input: VerdictReasoningAgentCreatePredictionVerdictInput): Promise<{

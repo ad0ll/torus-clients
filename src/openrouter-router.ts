@@ -14,6 +14,7 @@ export class OpenrouterRouterClient {
   constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['openrouter-router'].url) {
     const keypair = new Keypair(mnemonic);
     this.client = new AgentClient({ keypair, baseUrl });
+    console.log('OpenrouterRouterClient initialized at', baseUrl);
   }
 
   async completions(

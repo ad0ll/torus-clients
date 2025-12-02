@@ -14,6 +14,7 @@ export class PredictionVerifiabilityCheckerClient {
   constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['prediction-verifiability-checker'].url) {
     const keypair = new Keypair(mnemonic);
     this.client = new AgentClient({ keypair, baseUrl });
+    console.log('PredictionVerifiabilityCheckerClient initialized at', baseUrl);
   }
 
   async checkVerifiability(input: CheckPredictionVerifiabilityInput): Promise<{

@@ -16,6 +16,7 @@ export class EnglishClassifierClient {
   constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['english-classifier'].url) {
     const keypair = new Keypair(mnemonic);
     this.client = new AgentClient({ keypair, baseUrl });
+    console.log('EnglishClassifierClient initialized at', baseUrl);
   }
 
   async text(input: EnglishClassifierIsEnglishRequest) {

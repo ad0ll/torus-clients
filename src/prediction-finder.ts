@@ -3,6 +3,8 @@ import { AgentClient, Keypair } from '@torus-network/sdk/agent-client';
 import { agentPublicConfigs } from './common';
 import {
   type PredictionFinderOnDemandInputSchema,
+  type PredictionFinderProcessSwarmTweetsInputSchema,
+  type PredictionFinderProcessSwarmTweetsOutputSchema,
   type PredictionFinderScheduledInputSchema,
   type PredictionFinderScheduledProphetFinderInputSchema,
 } from './schemas';
@@ -14,6 +16,7 @@ export class PredictionFinderClient {
   constructor(mnemonic: string, baseUrl: string = agentPublicConfigs['prediction-finder'].url) {
     const keypair = new Keypair(mnemonic);
     this.client = new AgentClient({ keypair, baseUrl });
+    console.log('PredictionFinderClient initialized at', baseUrl);
   }
 
   async findPredictionsOnDemand(input: PredictionFinderOnDemandInputSchema) {
@@ -69,6 +72,34 @@ export class PredictionFinderClient {
       return {
         success: false,
         error: response.error?.message || 'Failed to call scheduled-prophet-finder endpoint',
+      };
+    }
+  }
+
+  async processSwarmTweets(input: PredictionFinderProcessSwarmTweetsInputSchema): Promise<
+    | {
+        success: true;
+        data: PredictionFinderProcessSwarmTweetsOutputSchema;
+      }
+    | {
+        success: false;
+        error: string;
+      }
+  > {
+    const response = await this.client.call({
+      endpoint: 'process-swarm-tweets',
+      data: input,
+    });
+
+    if (response.success) {
+      return {
+        success: true,
+        data: response.data as PredictionFinderProcessSwarmTweetsOutputSchema,
+      };
+    } else {
+      return {
+        success: false,
+        error: response.error?.message || 'Failed to call process-swarm-tweets endpoint',
       };
     }
   }
